@@ -1,12 +1,19 @@
 import express from "express";
 import bodyParser from "body-parser";
 import nodemailer from "nodemailer";
+import cors from "cors";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.use(
+	cors({
+		origin: "http://localhost:5173",
+	})
+);
 
 // Configurar o transporte de email
 const transporter = nodemailer.createTransport({
