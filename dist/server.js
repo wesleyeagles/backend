@@ -1,7 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __importDefault =
+	(this && this.__importDefault) ||
+	function (mod) {
+		return mod && mod.__esModule ? mod : { default: mod };
+	};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -12,20 +14,20 @@ app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use(body_parser_1.default.json());
 // Configurar o transporte de email
 const transporter = nodemailer_1.default.createTransport({
-    host: "mail.ibtec.org.br",
-    port: 465,
-    auth: {
-        user: "dev@ibtec.org.br",
-        pass: "Dev110591",
-    },
+	host: "mail.ibtec.org.br",
+	port: 465,
+	auth: {
+		user: "dev@ibtec.org.br",
+		pass: "Dev110591",
+	},
 });
 app.post("/enviar-formulario", (req, res) => {
-    const { Nome, Email, Telefone, Assunto, Mensagem } = req.body;
-    const mailOptions = {
-        from: "seu-email@gmail.com",
-        to: "crafael.wesley@gmail.com",
-        subject: "Mensagem do formulário de contato",
-        html: `
+	const { Nome, Email, Telefone, Assunto, Mensagem } = req.body;
+	const mailOptions = {
+		from: "seu-email@gmail.com",
+		to: "crafael.wesley@gmail.com",
+		subject: "Mensagem do formulário de contato",
+		html: `
     <html>
     <body>
       <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
@@ -41,19 +43,18 @@ app.post("/enviar-formulario", (req, res) => {
     </body>
     </html>
   `,
-    };
-    // Enviar o email
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log(error);
-            res.status(500).send("Erro ao enviar o email");
-        }
-        else {
-            console.log("Email enviado: " + info.response);
-            res.status(200).send("Email enviado com sucesso");
-        }
-    });
+	};
+	// Enviar o email
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+			console.log(error);
+			res.status(500).send("Erro ao enviar o email");
+		} else {
+			console.log("Email enviado: " + info.response);
+			res.status(200).send("Email enviado com sucesso");
+		}
+	});
 });
 app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
+	console.log(`Servidor rodando na porta ${port}`);
 });
