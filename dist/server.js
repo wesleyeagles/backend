@@ -54,10 +54,10 @@ app.post("/enviar-formulario", (req, res) => {
 	transporter.sendMail(mailOptions, (error, info) => {
 		if (error) {
 			console.log(error);
-			res.status(500).send("Erro ao enviar o email");
+			res.status(500).send("Erro ao enviar o contato");
 		} else {
 			console.log("Email enviado: " + info.response);
-			res.status(200).send("Email enviado com sucesso");
+			res.status(200).send("Contato enviado com sucesso");
 		}
 	});
 });
