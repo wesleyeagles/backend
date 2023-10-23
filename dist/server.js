@@ -15,7 +15,7 @@ app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use(body_parser_1.default.json());
 app.use(
 	(0, cors_1.default)({
-		origin: ["http://localhost:5173", "https://dev.ibtec.org.br/"],
+		origin: ["http://localhost:5173", "https://dev.ibtec.org.br"],
 	})
 );
 // Configurar o transporte de email
