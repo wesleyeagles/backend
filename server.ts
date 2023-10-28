@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import nodemailer from "nodemailer";
 import cors from "cors";
+import { createConnection } from "mysql";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,9 +12,26 @@ app.use(bodyParser.json());
 
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: ["http://localhost:5173", "https://dev.ibtec.org.br"],
 	})
 );
+
+// Configuração da conexão com o banco de dados
+const db = createConnection({
+	host: "https://ibtec.org.br/",
+	user: "ctcca_dev",
+	password: "Eagles110591",
+	database: "ctcca_ibtec",
+});
+
+// Conectar ao banco de dados
+db.connect((err) => {
+	if (err) {
+		console.error("Erro ao conectar ao banco de dados:", err);
+	} else {
+		console.log("Conexão bem-sucedida ao banco de dados");
+	}
+});
 
 // Configurar o transporte de email
 const transporter = nodemailer.createTransport({
@@ -23,6 +41,22 @@ const transporter = nodemailer.createTransport({
 		user: "dev@ibtec.org.br",
 		pass: "Dev110591",
 	},
+});
+
+// Rota para realizar a consulta
+app.get("/consultar-dados", (req, res) => {
+	// Exemplo de consulta SELECT
+	const query = "SELECT * FROM `associates`"; // Substitua 'sua_tabela' pelo nome da sua tabela
+
+	db.query(query, (error, results, fields) => {
+		if (error) {
+			console.error("Erro na consulta:", error);
+			res.status(500).send("Erro na consulta ao banco de dados");
+		} else {
+			// Os resultados da consulta estão em 'results'
+			res.status(200).json(results);
+		}
+	});
 });
 
 app.post("/enviar-formulario", (req, res) => {
