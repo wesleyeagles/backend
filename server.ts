@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import nodemailer from "nodemailer";
 import cors from "cors";
+import * as http from "http";
 import { createConnection } from "mysql";
 
 const app = express();
@@ -33,6 +34,21 @@ db.connect((err) => {
 	}
 });
 
+// Função para manter a conexão com o banco ativa
+function keepDBConnectionAlive() {
+	const query = "SELECT 1"; // Consulta simples que não faz nada, apenas mantém a conexão ativa
+	db.query(query, (error) => {
+		if (error) {
+			console.error("Erro na consulta de manutenção da conexão:", error);
+		} else {
+			console.log("Consulta de manutenção da conexão bem-sucedida");
+		}
+	});
+}
+
+// Chamar a função a cada 250 segundos (250000 milissegundos)
+setInterval(keepDBConnectionAlive, 250000);
+
 // Configurar o transporte de email
 const transporter = nodemailer.createTransport({
 	host: "mail.ibtec.org.br",
@@ -41,10 +57,6 @@ const transporter = nodemailer.createTransport({
 		user: "dev@ibtec.org.br",
 		pass: "Dev110591",
 	},
-});
-
-db.query("select 1 + 1", (err, rows) => {
-	/* */
 });
 
 // Rota para realizar a consulta

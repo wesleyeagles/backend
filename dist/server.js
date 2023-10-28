@@ -50,6 +50,17 @@ db.connect((err) => {
     console.log("Conex\xE3o bem-sucedida ao banco de dados");
   }
 });
+function keepDBConnectionAlive() {
+  const query = "SELECT 1";
+  db.query(query, (error) => {
+    if (error) {
+      console.error("Erro na consulta de manuten\xE7\xE3o da conex\xE3o:", error);
+    } else {
+      console.log("Consulta de manuten\xE7\xE3o da conex\xE3o bem-sucedida");
+    }
+  });
+}
+setInterval(keepDBConnectionAlive, 25e4);
 var transporter = import_nodemailer.default.createTransport({
   host: "mail.ibtec.org.br",
   port: 465,
@@ -57,8 +68,6 @@ var transporter = import_nodemailer.default.createTransport({
     user: "dev@ibtec.org.br",
     pass: "Dev110591"
   }
-});
-db.query("select 1 + 1", (err, rows) => {
 });
 app.get("/consultar-dados", (req, res) => {
   const query = "SELECT * FROM `associates` WHERE active = 1";
