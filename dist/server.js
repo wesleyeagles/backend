@@ -44,8 +44,6 @@ var db = (0, import_mysql.createConnection)({
 	user: "ctcca_dev",
 	password: "Eagles110591",
 	database: "ctcca_ibtec",
-	reconnect: true, // Habilita a reconexão automática
-	connectionLimit: 10, // Limite de conexões ativas
 });
 db.connect((err) => {
 	if (err) {
@@ -73,7 +71,6 @@ app.get("/consultar-dados", (req, res) => {
 		}
 	});
 });
-
 app.get("/cities", (req, res) => {
 	const query = "SELECT * FROM `cities`";
 	db.query(query, (error, results, fields) => {
@@ -85,7 +82,6 @@ app.get("/cities", (req, res) => {
 		}
 	});
 });
-
 app.get("/segments", (req, res) => {
 	const query = "SELECT * FROM `segments` WHERE active = 1";
 	db.query(query, (error, results, fields) => {
@@ -97,7 +93,6 @@ app.get("/segments", (req, res) => {
 		}
 	});
 });
-
 app.post("/enviar-formulario", (req, res) => {
 	const { Nome, Email, Telefone, Assunto, Mensagem } = req.body;
 	const mailOptions = {

@@ -18,7 +18,7 @@ app.use(
 
 // Configuração da conexão com o banco de dados
 const db = createConnection({
-	host: "https://ibtec.org.br/",
+	host: "server01.ibtec.org.br",
 	user: "ctcca_dev",
 	password: "Eagles110591",
 	database: "ctcca_ibtec",
@@ -45,15 +45,36 @@ const transporter = nodemailer.createTransport({
 
 // Rota para realizar a consulta
 app.get("/consultar-dados", (req, res) => {
-	// Exemplo de consulta SELECT
-	const query = "SELECT * FROM `associates`"; // Substitua 'sua_tabela' pelo nome da sua tabela
-
+	const query = "SELECT * FROM `associates` WHERE active = 1";
 	db.query(query, (error, results, fields) => {
 		if (error) {
 			console.error("Erro na consulta:", error);
 			res.status(500).send("Erro na consulta ao banco de dados");
 		} else {
-			// Os resultados da consulta estão em 'results'
+			res.status(200).json(results);
+		}
+	});
+});
+
+app.get("/cities", (req, res) => {
+	const query = "SELECT * FROM `cities`";
+	db.query(query, (error, results, fields) => {
+		if (error) {
+			console.error("Erro na consulta:", error);
+			res.status(500).send("Erro na consulta ao banco de dados");
+		} else {
+			res.status(200).json(results);
+		}
+	});
+});
+
+app.get("/segments", (req, res) => {
+	const query = "SELECT * FROM `segments` WHERE active = 1";
+	db.query(query, (error, results, fields) => {
+		if (error) {
+			console.error("Erro na consulta:", error);
+			res.status(500).send("Erro na consulta ao banco de dados");
+		} else {
 			res.status(200).json(results);
 		}
 	});
