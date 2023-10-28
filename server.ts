@@ -43,6 +43,10 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
+db.query("select 1 + 1", (err, rows) => {
+	/* */
+});
+
 // Rota para realizar a consulta
 app.get("/consultar-dados", (req, res) => {
 	const query = "SELECT * FROM `associates` WHERE active = 1";
