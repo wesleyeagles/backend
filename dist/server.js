@@ -402,7 +402,32 @@ router5.get("/todos-associados", associatesController_default.getAllAssociates);
 var associates_default = router5;
 
 // server.ts
+var import_sequelize7 = require("sequelize");
+var import_axios = __toESM(require("axios"));
+
+// models/AccessLog.ts
 var import_sequelize6 = require("sequelize");
+var AccessLog = db_default.define("AccessLog", {
+  timestamp: {
+    type: import_sequelize6.DataTypes.DATE,
+    allowNull: false
+  },
+  ip_address: {
+    type: import_sequelize6.DataTypes.STRING,
+    allowNull: false
+  },
+  country: {
+    type: import_sequelize6.DataTypes.STRING,
+    allowNull: true
+  },
+  referer: {
+    type: import_sequelize6.DataTypes.STRING,
+    allowNull: true
+  }
+});
+var AccessLog_default = AccessLog;
+
+// server.ts
 var app = (0, import_express6.default)();
 var port = process.env.PORT || 3e3;
 app.use(import_body_parser.default.urlencoded({ extended: false }));
@@ -412,7 +437,7 @@ app.use(
     origin: ["http://localhost:5173", "https://dev.ibtec.org.br"]
   })
 );
-var sequelize2 = new import_sequelize6.Sequelize({
+var sequelize2 = new import_sequelize7.Sequelize({
   dialect: "mysql",
   host: "server01.ibtec.org.br",
   username: "ctcca_dev",
@@ -439,6 +464,39 @@ app.use("/api/cities", cities_default);
 app.use("/api/segments", segments_default);
 app.use("/api/contact", contactForm_default);
 app.use("/api/associates", associates_default);
+app.use((req, res, next) => __async(exports, null, function* () {
+  const clientIP = req.ip;
+  console.log(clientIP);
+  try {
+    const response = yield import_axios.default.get(`https://ipinfo.io/${clientIP}/json`);
+    const data = response.data;
+    const country = data.country;
+    const referrer = req.get("referrer");
+    try {
+      const today = /* @__PURE__ */ new Date();
+      today.setHours(0, 0, 0, 0);
+      const existingVisit = yield AccessLog_default.findOne({
+        where: {
+          timestamp: {
+            [import_sequelize7.Op.gte]: today
+          }
+        }
+      });
+      if (!existingVisit) {
+        yield AccessLog_default.create({
+          timestamp: /* @__PURE__ */ new Date(),
+          country,
+          referrer
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao registrar a visita:", error);
+    }
+  } catch (error) {
+    console.error("Erro ao obter informa\xE7\xF5es de geolocaliza\xE7\xE3o:", error);
+  }
+  next();
+}));
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
