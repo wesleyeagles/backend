@@ -162,13 +162,29 @@ var import_express2 = __toESM(require("express"));
 
 // models/City.ts
 var import_sequelize3 = require("sequelize");
-var City = db_default.define("City", {
-  name: {
-    type: import_sequelize3.DataTypes.STRING,
-    allowNull: false
+var City = db_default.define(
+  "City",
+  {
+    id: {
+      type: import_sequelize3.DataTypes.NUMBER,
+      allowNull: false,
+      primaryKey: true
+    },
+    city: {
+      type: import_sequelize3.DataTypes.STRING,
+      allowNull: false
+    },
+    uf: {
+      type: import_sequelize3.DataTypes.STRING,
+      allowNull: false
+    }
+    // Outros campos do modelo City
+  },
+  {
+    timestamps: false,
+    tableName: "cities"
   }
-  // Outros campos do modelo City
-});
+);
 var City_default = City;
 
 // controllers/citiesController.ts
@@ -302,17 +318,64 @@ var import_express5 = __toESM(require("express"));
 
 // models/Associate.ts
 var import_sequelize5 = require("sequelize");
-var Associate = db_default.define("Associate", {
-  name: {
-    type: import_sequelize5.DataTypes.STRING,
-    allowNull: false
+var Associate = db_default.define(
+  "associate",
+  {
+    id: {
+      type: import_sequelize5.DataTypes.NUMBER,
+      allowNull: false,
+      primaryKey: true
+    },
+    segment_id: {
+      type: import_sequelize5.DataTypes.NUMBER,
+      allowNull: false
+    },
+    city_id: {
+      type: import_sequelize5.DataTypes.NUMBER,
+      allowNull: false
+    },
+    fantasy_name: {
+      type: import_sequelize5.DataTypes.STRING,
+      allowNull: false
+    },
+    state: {
+      type: import_sequelize5.DataTypes.STRING,
+      allowNull: false
+    },
+    address: {
+      type: import_sequelize5.DataTypes.STRING,
+      allowNull: false
+    },
+    neighborhood: {
+      type: import_sequelize5.DataTypes.STRING,
+      allowNull: false
+    },
+    zip_code: {
+      type: import_sequelize5.DataTypes.STRING,
+      allowNull: false
+    },
+    phone: {
+      type: import_sequelize5.DataTypes.STRING,
+      allowNull: false
+    },
+    website: {
+      type: import_sequelize5.DataTypes.STRING,
+      allowNull: false
+    },
+    image: {
+      type: import_sequelize5.DataTypes.STRING,
+      allowNull: false
+    },
+    // Outros campos do modelo Associate
+    active: {
+      type: import_sequelize5.DataTypes.BOOLEAN,
+      defaultValue: true
+    }
   },
-  // Outros campos do modelo Associate
-  active: {
-    type: import_sequelize5.DataTypes.BOOLEAN,
-    defaultValue: true
+  {
+    timestamps: false
   }
-});
+);
 var Associate_default = Associate;
 
 // controllers/associatesController.ts
