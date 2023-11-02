@@ -1,31 +1,30 @@
 import { Request, Response } from "express";
-import db from "../config/db";
+import Post from "../models/Post"; // Importe o modelo Post
 
-const getAllPosts = (req: Request, res: Response) => {
-	const query = "SELECT * FROM posts";
-	db.query(query, (error, results) => {
-		if (error) {
-			console.error("Erro ao obter os posts:", error);
-			res.status(500).json({ error: "Erro ao obter os posts" });
-		} else {
-			res.status(200).json(results);
-		}
-	});
+const getAllPosts = async (req: Request, res: Response) => {
+	try {
+		const posts = await Post.findAll();
+
+		res.status(200).json(posts);
+	} catch (error) {
+		console.error("Erro ao obter os posts:", error);
+		res.status(500).json({ error: "Erro ao obter os posts" });
+	}
 };
 
-const createPost = (titulo: string, conteudo: string, imagem: string) => {
-	return new Promise((resolve, reject) => {
-		const sql = "INSERT INTO posts (titulo, conteudo, imagem) VALUES (?, ?, ?)";
-		db.query(sql, [titulo, conteudo, imagem], (error, result) => {
-			if (error) {
-				console.error("Erro ao inserir o post:", error);
-				reject({ error: "Erro ao inserir o post" });
-			} else {
-				const postId = result.insertId;
-				resolve({ message: "Post criado com sucesso", postId });
-			}
+const createPost = async (titulo: string, conteudo: string, imagem: string) => {
+	try {
+		const post = await Post.create({
+			titulo,
+			conteudo,
+			imagem,
 		});
-	});
+
+		return post.post_id; // Retorna o ID do post criado
+	} catch (error) {
+		console.error("Erro ao criar o post:", error);
+		throw new Error("Erro ao criar o post");
+	}
 };
 
 export default {

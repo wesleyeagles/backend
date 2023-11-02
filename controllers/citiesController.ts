@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
-import db from "../config/db";
+import City from "../models/City"; // Importe o modelo City
 
-const getAllCities = (req: Request, res: Response) => {
-	const query = "SELECT * FROM cities";
-	db.query(query, (error, results) => {
-		if (error) {
-			console.error("Erro ao obter as cidades:", error);
-			res.status(500).json({ error: "Erro ao obter as cidades" });
-		} else {
-			res.status(200).json(results);
-		}
-	});
+const getAllCities = async (req: Request, res: Response) => {
+	try {
+		const cities = await City.findAll();
+
+		res.status(200).json(cities);
+	} catch (error) {
+		console.error("Erro ao obter as cidades:", error);
+		res.status(500).json({ error: "Erro ao obter as cidades" });
+	}
 };
 
 export default {

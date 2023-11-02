@@ -6,7 +6,7 @@ import citiesRouter from "./routes/cities";
 import segmentsRouter from "./routes/segments";
 import contactFormRouter from "./routes/contactForm";
 import associatesRouter from "./routes/associates";
-import { createConnection } from "mysql";
+import { Sequelize } from "sequelize";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,33 +20,29 @@ app.use(
 	})
 );
 
-const db = createConnection({
+// Configure o Sequelize para se conectar ao banco de dados
+const sequelize = new Sequelize({
+	dialect: "mysql",
 	host: "server01.ibtec.org.br",
-	user: "ctcca_dev",
+	username: "ctcca_dev",
 	password: "Eagles110591",
 	database: "ctcca_ibtec",
+	pool: {
+		max: 5, // Número máximo de conexões no pool
+		min: 0, // Número mínimo de conexões no pool
+		acquire: 250000, // Tempo máximo em milissegundos para adquirir uma conexão
+		idle: 10000, // Tempo máximo em milissegundos que uma conexão pode ficar inativa
+	},
 });
-
-db.connect((err) => {
-	if (err) {
-		console.error("Erro ao conectar ao banco de dados:", err);
-	} else {
+// Verifique a conexão com o banco de dados
+sequelize
+	.authenticate()
+	.then(() => {
 		console.log("Conexão bem-sucedida ao banco de dados");
-	}
-});
-
-const keepDBConnectionAlive = () => {
-	const query = "SELECT 1";
-	db.query(query, (error) => {
-		if (error) {
-			console.error("Erro na consulta de manutenção da conexão:", error);
-		} else {
-			console.log("Consulta de manutenção da conexão bem-sucedida");
-		}
+	})
+	.catch((err) => {
+		console.error("Erro ao conectar ao banco de dados:", err);
 	});
-};
-
-setInterval(keepDBConnectionAlive, 250000);
 
 // Roteamento para as rotas de posts
 app.use("/api/posts", postsRouter);

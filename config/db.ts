@@ -1,18 +1,20 @@
-import { createConnection } from "mysql";
+import { Sequelize } from "sequelize";
 
-const db = createConnection({
+const sequelize = new Sequelize("ctcca_ibtec", "ctcca_dev", "Eagles110591", {
 	host: "server01.ibtec.org.br",
-	user: "ctcca_dev",
-	password: "Eagles110591",
-	database: "ctcca_ibtec",
+	dialect: "mysql",
+	dialectOptions: {
+		keepAlive: true, // Ativar a consulta de manutenção
+	},
 });
 
-db.connect((err) => {
-	if (err) {
-		console.error("Erro ao conectar ao banco de dados:", err);
-	} else {
-		console.log("Conexão bem-sucedida ao banco de dados");
-	}
-});
+sequelize
+	.authenticate()
+	.then(() => {
+		console.log("Conexão com o banco de dados estabelecida com sucesso.");
+	})
+	.catch((error) => {
+		console.error("Erro ao conectar ao banco de dados:", error);
+	});
 
-export default db;
+export default sequelize;
