@@ -6,9 +6,7 @@ import citiesRouter from "./routes/cities";
 import segmentsRouter from "./routes/segments";
 import contactFormRouter from "./routes/contactForm";
 import associatesRouter from "./routes/associates";
-import { Op, Sequelize } from "sequelize";
-import axios from "axios"; // Importe a biblioteca "axios" para fazer solicitações HTTP
-import AccessLog from "./models/AccessLog";
+import { Sequelize } from "sequelize";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -52,51 +50,6 @@ app.use("/api/cities", citiesRouter);
 app.use("/api/segments", segmentsRouter);
 app.use("/api/contact", contactFormRouter);
 app.use("/api/associates", associatesRouter);
-
-// Middleware para rastreamento de visitas
-app.post("/api/track-visit", async (req, res, next) => {
-	const clientIP = req.ip;
-
-	console.log(clientIP);
-
-	// Use a API de geolocalização para obter informações sobre o país
-	try {
-		const response = await axios.get(`https://ipinfo.io/${clientIP}/json`);
-
-		const data = response.data;
-		const country = data.country;
-
-		// Obtenha a URL de referência do cabeçalho da solicitação
-		const referrer = req.get("referrer");
-
-		// Registre o acesso no banco de dados
-		try {
-			const today = new Date();
-			today.setHours(0, 0, 0, 0);
-
-			const existingVisit = await AccessLog.findOne({
-				where: {
-					timestamp: {
-						[Op.gte]: today,
-					},
-				},
-			});
-
-			if (!existingVisit) {
-				await AccessLog.create({
-					timestamp: new Date(),
-					country,
-					referrer,
-				});
-			}
-		} catch (error) {
-			console.error("Erro ao registrar a visita:", error);
-		}
-	} catch (error) {
-		console.error("Erro ao obter informações de geolocalização:", error);
-	}
-	next();
-});
 
 app.listen(port, () => {
 	console.log(`Servidor rodando na porta ${port}`);
