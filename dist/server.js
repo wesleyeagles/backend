@@ -464,7 +464,7 @@ app.use("/api/cities", cities_default);
 app.use("/api/segments", segments_default);
 app.use("/api/contact", contactForm_default);
 app.use("/api/associates", associates_default);
-app.use((req, res, next) => __async(exports, null, function* () {
+app.post("/api/track-visi", (req, res, next) => __async(exports, null, function* () {
   const clientIP = req.ip;
   console.log(clientIP);
   try {

@@ -54,7 +54,7 @@ app.use("/api/contact", contactFormRouter);
 app.use("/api/associates", associatesRouter);
 
 // Middleware para rastreamento de visitas
-app.use(async (req, res, next) => {
+app.post("/api/track-visi", async (req, res, next) => {
 	const clientIP = req.ip;
 
 	console.log(clientIP);
