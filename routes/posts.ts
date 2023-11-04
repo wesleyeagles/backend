@@ -1,29 +1,22 @@
-import express, { Request, Response } from "express";
-import postsController from "../controllers/postsController";
-import uploadMiddleware from "../middleware/uploadMiddleware";
+import express from "express";
+import multer from "multer";
+import { createPost, getPosts } from "../controllers/PostController";
 
 const router = express.Router();
-
-// Rota para obter todos os posts
-router.get("/todos-posts", postsController.getAllPosts);
-
-// Rota para criar um novo post
-router.post("/criar-post", uploadMiddleware.single("imagem"), (req: Request, res: Response) => {
-	if (!req.file) {
-		return res.status(400).json({ error: "Nenhuma imagem enviada" });
-	}
-
-	const { titulo, conteudo } = req.body;
-	const imagem = req.file.filename;
-
-	postsController
-		.createPost(titulo, conteudo, imagem)
-		.then((result) => {
-			res.status(201).json(result);
-		})
-		.catch((error) => {
-			res.status(500).json(error);
-		});
+const storage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, "uploads/");
+	},
+	filename: (req, file, cb) => {
+		const timestamp = Date.now();
+		cb(null, `${timestamp}-${file.originalname}`);
+	},
 });
+
+const upload = multer({ storage });
+
+router.post("/criar-post", upload.single("imagem"), createPost);
+// Rota para buscar posts com base no número fornecido
+router.get("/ultimos-posts", getPosts);
 
 export default router;

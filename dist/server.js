@@ -43,12 +43,13 @@ var __async = (__this, __arguments, generator) => {
 };
 
 // server.ts
-var import_express6 = __toESM(require("express"));
+var import_express8 = __toESM(require("express"));
 var import_body_parser = __toESM(require("body-parser"));
 var import_cors = __toESM(require("cors"));
 
 // routes/posts.ts
 var import_express = __toESM(require("express"));
+var import_multer = __toESM(require("multer"));
 
 // models/Post.ts
 var import_sequelize2 = require("sequelize");
@@ -75,16 +76,14 @@ var Post = class extends import_sequelize2.Model {
 };
 Post.init(
   {
-    post_id: {
-      type: import_sequelize2.DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
+    slug: {
+      type: import_sequelize2.DataTypes.STRING
     },
     titulo: {
       type: import_sequelize2.DataTypes.STRING
     },
     conteudo: {
-      type: import_sequelize2.DataTypes.STRING
+      type: import_sequelize2.DataTypes.TEXT
     },
     imagem: {
       type: import_sequelize2.DataTypes.STRING
@@ -98,63 +97,60 @@ Post.init(
 );
 var Post_default = Post;
 
-// controllers/postsController.ts
-var getAllPosts = (req, res) => __async(void 0, null, function* () {
+// controllers/PostController.ts
+var import_remove_accents = require("remove-accents");
+var createPost = (req, res) => __async(void 0, null, function* () {
   try {
-    const posts = yield Post_default.findAll();
-    res.status(200).json(posts);
-  } catch (error) {
-    console.error("Erro ao obter os posts:", error);
-    res.status(500).json({ error: "Erro ao obter os posts" });
-  }
-});
-var createPost = (titulo, conteudo, imagem) => __async(void 0, null, function* () {
-  try {
-    const post = yield Post_default.create({
+    const { titulo, conteudo } = req.body;
+    if (typeof titulo !== "string") {
+      return res.status(400).json({ error: "O t\xEDtulo deve ser uma string v\xE1lida." });
+    }
+    const existingPost = yield Post_default.findOne({ where: { titulo } });
+    if (existingPost) {
+      return res.status(400).json({ error: "J\xE1 existe um post com o mesmo t\xEDtulo." });
+    }
+    const slug = (0, import_remove_accents.remove)(titulo).toLowerCase().replace(/\s+/g, "-");
+    const newPost = yield Post_default.create({
       titulo,
+      slug,
       conteudo,
-      imagem
+      imagem: req.file ? req.file.filename : null
     });
-    return post.post_id;
+    res.status(201).json(newPost);
   } catch (error) {
-    console.error("Erro ao criar o post:", error);
-    throw new Error("Erro ao criar o post");
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 });
-var postsController_default = {
-  getAllPosts,
-  createPost
-};
+var getPosts = (req, res) => __async(void 0, null, function* () {
+  try {
+    const limit = req.query.limit;
+    const parsedLimit = limit ? parseInt(limit, 10) : 3;
+    if (isNaN(parsedLimit)) {
+      return res.status(400).json({ error: "O par\xE2metro limit n\xE3o \xE9 um n\xFAmero v\xE1lido." });
+    }
+    const posts = yield Post_default.findAll({ limit: parsedLimit, order: [["id", "DESC"]] });
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
 
-// middleware/uploadMiddleware.ts
-var import_multer = __toESM(require("multer"));
+// routes/posts.ts
+var router = import_express.default.Router();
 var storage = import_multer.default.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    const fileName = Date.now() + "-" + file.originalname;
-    cb(null, fileName);
+    const timestamp = Date.now();
+    cb(null, `${timestamp}-${file.originalname}`);
   }
 });
 var upload = (0, import_multer.default)({ storage });
-var uploadMiddleware_default = upload;
-
-// routes/posts.ts
-var router = import_express.default.Router();
-router.get("/todos-posts", postsController_default.getAllPosts);
-router.post("/criar-post", uploadMiddleware_default.single("imagem"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "Nenhuma imagem enviada" });
-  }
-  const { titulo, conteudo } = req.body;
-  const imagem = req.file.filename;
-  postsController_default.createPost(titulo, conteudo, imagem).then((result) => {
-    res.status(201).json(result);
-  }).catch((error) => {
-    res.status(500).json(error);
-  });
-});
+router.post("/criar-post", upload.single("imagem"), createPost);
+router.get("/ultimos-posts", getPosts);
 var posts_default = router;
 
 // routes/cities.ts
@@ -401,9 +397,106 @@ var router5 = import_express5.default.Router();
 router5.get("/todos-associados", associatesController_default.getAllAssociates);
 var associates_default = router5;
 
-// server.ts
+// routes/auth.ts
+var import_express6 = require("express");
+
+// models/User.ts
 var import_sequelize6 = require("sequelize");
-var app = (0, import_express6.default)();
+var User = class extends import_sequelize6.Model {
+};
+User.init(
+  {
+    id: {
+      type: import_sequelize6.DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
+    role: {
+      type: new import_sequelize6.DataTypes.STRING(128),
+      allowNull: false
+    },
+    name: {
+      type: new import_sequelize6.DataTypes.STRING(128),
+      allowNull: false
+    },
+    email: {
+      type: new import_sequelize6.DataTypes.STRING(128),
+      allowNull: false
+    },
+    password: {
+      type: new import_sequelize6.DataTypes.STRING(128),
+      allowNull: false
+    }
+  },
+  {
+    sequelize: db_default,
+    tableName: "users",
+    timestamps: false
+  }
+);
+
+// controllers/AuthController.ts
+var import_bcrypt = __toESM(require("bcrypt"));
+var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
+var secretKey = "Wszwe94q@@dSa$%a15Z";
+var AuthController = class {
+  static login(req, res) {
+    return __async(this, null, function* () {
+      const { email, password } = req.body;
+      try {
+        const user = yield User.findOne({ where: { email } });
+        if (!user) {
+          res.status(401).json({ message: "Usu\xE1rio n\xE3o encontrado" });
+          return;
+        }
+        if (!import_bcrypt.default.compareSync(password, user.password)) {
+          res.status(401).json({ message: "Senha incorreta" });
+          return;
+        }
+        const token = import_jsonwebtoken.default.sign({ id: user.id, email: user.email }, secretKey);
+        res.json({ token, user });
+      } catch (error) {
+        console.error("Erro no login:", error);
+        res.status(500).json({ message: "Erro no servidor" });
+      }
+    });
+  }
+};
+
+// routes/auth.ts
+var authRouter = (0, import_express6.Router)();
+authRouter.post("/login", AuthController.login);
+
+// routes/user.ts
+var import_express7 = require("express");
+
+// controllers/UserController.ts
+var UserController = class {
+  static getUserById(req, res) {
+    return __async(this, null, function* () {
+      const { id } = req.params;
+      try {
+        const user = yield User.findOne({ where: { id } });
+        if (!user) {
+          res.status(401).json({ message: "Usu\xE1rio n\xE3o encontrado" });
+          return;
+        }
+        res.json({ user }.user);
+      } catch (error) {
+        console.error("Erro no login:", error);
+        res.status(500).json({ message: "Erro no servidor" });
+      }
+    });
+  }
+};
+
+// routes/user.ts
+var userRouter = (0, import_express7.Router)();
+userRouter.get("/usuario-por-id/:id", UserController.getUserById);
+
+// server.ts
+var import_sequelize7 = require("sequelize");
+var app = (0, import_express8.default)();
 var port = process.env.PORT || 3e3;
 app.use(import_body_parser.default.urlencoded({ extended: false }));
 app.use(import_body_parser.default.json());
@@ -412,7 +505,7 @@ app.use(
     origin: ["http://localhost:5173", "https://dev.ibtec.org.br"]
   })
 );
-var sequelize2 = new import_sequelize6.Sequelize({
+var sequelize2 = new import_sequelize7.Sequelize({
   dialect: "mysql",
   host: "server01.ibtec.org.br",
   username: "ctcca_dev",
@@ -435,10 +528,12 @@ sequelize2.authenticate().then(() => {
   console.error("Erro ao conectar ao banco de dados:", err);
 });
 app.use("/api/posts", posts_default);
+app.use("/api/auth", authRouter);
 app.use("/api/cities", cities_default);
 app.use("/api/segments", segments_default);
 app.use("/api/contact", contactForm_default);
 app.use("/api/associates", associates_default);
+app.use("/api/user", userRouter);
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });

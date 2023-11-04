@@ -6,6 +6,8 @@ import citiesRouter from "./routes/cities";
 import segmentsRouter from "./routes/segments";
 import contactFormRouter from "./routes/contactForm";
 import associatesRouter from "./routes/associates";
+import { authRouter } from "./routes/auth";
+import { userRouter } from "./routes/user";
 import { Sequelize } from "sequelize";
 
 const app = express();
@@ -46,10 +48,12 @@ sequelize
 
 // Roteamento para as rotas de posts
 app.use("/api/posts", postsRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/cities", citiesRouter);
 app.use("/api/segments", segmentsRouter);
 app.use("/api/contact", contactFormRouter);
 app.use("/api/associates", associatesRouter);
+app.use("/api/user", userRouter);
 
 app.listen(port, () => {
 	console.log(`Servidor rodando na porta ${port}`);
