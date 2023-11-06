@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { createPost, getPosts } from "../controllers/PostController";
+import { createPost, deletePost, getPosts } from "../controllers/PostController";
 
 const router = express.Router();
 const storage = multer.diskStorage({
@@ -18,5 +18,8 @@ const upload = multer({ storage });
 router.post("/criar-post", upload.single("imagem"), createPost);
 // Rota para buscar posts com base no número fornecido
 router.get("/ultimos-posts", getPosts);
+
+// Rota para excluir uma notícia pelo ID
+router.delete("/deletar/:id", deletePost);
 
 export default router;

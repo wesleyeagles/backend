@@ -99,6 +99,8 @@ var Post_default = Post;
 
 // controllers/PostController.ts
 var import_remove_accents = require("remove-accents");
+var import_basic_ftp = require("basic-ftp");
+var import_sharp = __toESM(require("sharp"));
 var createPost = (req, res) => __async(void 0, null, function* () {
   try {
     const { titulo, conteudo } = req.body;
@@ -110,13 +112,42 @@ var createPost = (req, res) => __async(void 0, null, function* () {
       return res.status(400).json({ error: "J\xE1 existe um post com o mesmo t\xEDtulo." });
     }
     const slug = (0, import_remove_accents.remove)(titulo).toLowerCase().replace(/\s+/g, "-");
+    console.log(req.file);
+    if (req.file) {
+      const imagePath = req.file.path;
+      const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
+      yield (0, import_sharp.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+      const client = new import_basic_ftp.Client();
+      yield client.access({
+        host: "ftp.ibtec.org.br",
+        user: "dev@dev.ibtec.org.br",
+        password: "Dev04121996"
+      });
+      yield client.uploadFrom(webpPath, "/blog/" + req.file.filename.replace(/\.[^.]+$/, ".webp"));
+      yield client.close();
+    }
     const newPost = yield Post_default.create({
       titulo,
       slug,
       conteudo,
-      imagem: req.file ? req.file.filename : null
+      imagem: req.file ? req.file.filename.replace(/\.[^.]+$/, ".webp") : null
     });
     res.status(201).json(newPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+var deletePost = (req, res) => __async(void 0, null, function* () {
+  try {
+    const postId = Number(req.params.id);
+    const post = yield Post_default.findByPk(postId);
+    if (!post) {
+      res.status(404).json({ error: "Not\xEDcia n\xE3o encontrada" });
+      return;
+    }
+    yield post.destroy();
+    res.status(204).end();
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro interno do servidor" });
@@ -125,11 +156,11 @@ var createPost = (req, res) => __async(void 0, null, function* () {
 var getPosts = (req, res) => __async(void 0, null, function* () {
   try {
     const limit = req.query.limit;
-    const parsedLimit = limit ? parseInt(limit, 10) : 3;
-    if (isNaN(parsedLimit)) {
-      return res.status(400).json({ error: "O par\xE2metro limit n\xE3o \xE9 um n\xFAmero v\xE1lido." });
-    }
-    const posts = yield Post_default.findAll({ limit: parsedLimit, order: [["id", "DESC"]] });
+    const parsedLimit = limit ? parseInt(limit, 10) : void 0;
+    const posts = yield Post_default.findAll({
+      limit: typeof parsedLimit === "number" ? parsedLimit : void 0,
+      order: [["id", "DESC"]]
+    });
     res.json(posts);
   } catch (error) {
     console.error(error);
@@ -151,6 +182,7 @@ var storage = import_multer.default.diskStorage({
 var upload = (0, import_multer.default)({ storage });
 router.post("/criar-post", upload.single("imagem"), createPost);
 router.get("/ultimos-posts", getPosts);
+router.delete("/deletar/:id", deletePost);
 var posts_default = router;
 
 // routes/cities.ts
