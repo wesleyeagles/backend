@@ -1,10 +1,27 @@
 "use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
@@ -86,7 +103,7 @@ Post.init(
       type: import_sequelize2.DataTypes.TEXT
     },
     imagem: {
-      type: import_sequelize2.DataTypes.STRING
+      type: import_sequelize2.DataTypes.BLOB
     }
   },
   {
@@ -99,6 +116,7 @@ var Post_default = Post;
 
 // controllers/PostController.ts
 var import_remove_accents = require("remove-accents");
+var import_axios = __toESM(require("axios"));
 var import_basic_ftp = require("basic-ftp");
 var import_sharp = __toESM(require("sharp"));
 var createPost = (req, res) => __async(void 0, null, function* () {
@@ -136,6 +154,62 @@ var createPost = (req, res) => __async(void 0, null, function* () {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+var getPostById = (req, res) => __async(void 0, null, function* () {
+  try {
+    const postId = Number(req.params.id);
+    const post = yield Post_default.findByPk(postId);
+    if (!post) {
+      res.status(404).json({ error: "Postagem n\xE3o encontrada" });
+      return;
+    }
+    const remoteFileUrl = `https://dev.ibtec.org.br/dev/blog/${post.imagem}`;
+    const response = yield import_axios.default.get(remoteFileUrl, { responseType: "arraybuffer" });
+    const imageBuffer = Buffer.from(response.data);
+    const originalImageBuffer = yield (0, import_sharp.default)(imageBuffer).toBuffer();
+    res.json(__spreadProps(__spreadValues({}, post.toJSON()), {
+      originalImageBuffer
+    }));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+var editPost = (req, res) => __async(void 0, null, function* () {
+  try {
+    const postId = Number(req.params.id);
+    const post = yield Post_default.findByPk(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Postagem n\xE3o encontrada" });
+    }
+    const { titulo, conteudo } = req.body;
+    const slug = (0, import_remove_accents.remove)(titulo).toLowerCase().replace(/\s+/g, "-");
+    if (titulo === post.titulo && slug === post.slug && conteudo === post.conteudo && !req.file) {
+      return res.status(200).json({ message: "Nenhum dado foi modificado." });
+    }
+    post.titulo = titulo;
+    post.slug = slug;
+    post.conteudo = conteudo;
+    if (req.file) {
+      const imagePath = req.file.path;
+      const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
+      yield (0, import_sharp.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+      const client = new import_basic_ftp.Client();
+      yield client.access({
+        host: "ftp.ibtec.org.br",
+        user: "dev@dev.ibtec.org.br",
+        password: "Dev04121996"
+      });
+      yield client.uploadFrom(webpPath, "/blog/" + req.file.filename.replace(/\.[^.]+$/, ".webp"));
+      yield client.close();
+      post.imagem = req.file.filename.replace(/\.[^.]+$/, ".webp");
+    }
+    yield post.save();
+    return res.json(post);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
   }
 });
 var deletePost = (req, res) => __async(void 0, null, function* () {
@@ -183,6 +257,8 @@ var upload = (0, import_multer.default)({ storage });
 router.post("/criar-post", upload.single("imagem"), createPost);
 router.get("/ultimos-posts", getPosts);
 router.delete("/deletar/:id", deletePost);
+router.get("/post/:id", getPostById);
+router.put("/post/editar/:id", upload.single("imagem"), editPost);
 var posts_default = router;
 
 // routes/cities.ts

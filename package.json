@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsup server.ts",
     "dev": "tsx src/server.ts",
-    "start": "node dist/server.js"
+    "start": "tsup server.ts && node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -26,7 +26,8 @@
     "@types/mysql": "^2.15.23",
     "@types/node": "^20.8.7",
     "@types/nodemailer": "^6.4.13",
-    "axios": "^1.6.0",
+    "@types/sharp": "^0.32.0",
+    "axios": "^1.6.2",
     "basic-ftp": "^5.0.3",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",

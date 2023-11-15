@@ -20,7 +20,7 @@ Post.init(
 			type: DataTypes.TEXT,
 		},
 		imagem: {
-			type: DataTypes.STRING,
+			type: DataTypes.BLOB,
 		},
 	},
 	{
