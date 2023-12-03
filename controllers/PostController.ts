@@ -203,7 +203,6 @@ export const getPosts = async (req: Request, res: Response) => {
 export const getPostsDestaques = async (req: Request, res: Response) => {
 	try {
 		const posts = await Post.findAll({
-			limit: 2,
 			order: [["id", "DESC"]],
 		});
 
