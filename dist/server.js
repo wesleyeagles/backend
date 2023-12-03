@@ -246,6 +246,10 @@ var getPosts = (req, res) => __async(void 0, null, function* () {
 var getPostsDestaques = (req, res) => __async(void 0, null, function* () {
   try {
     const posts = yield Post_default.findAll({
+      where: {
+        destaque: 1
+        // Filtra os posts que têm destaque igual a 1
+      },
       limit: 2,
       order: [["id", "DESC"]]
     });

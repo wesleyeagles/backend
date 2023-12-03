@@ -203,6 +203,10 @@ export const getPosts = async (req: Request, res: Response) => {
 export const getPostsDestaques = async (req: Request, res: Response) => {
 	try {
 		const posts = await Post.findAll({
+			where: {
+				destaque: 1, // Filtra os posts que têm destaque igual a 1
+			},
+			limit: 2,
 			order: [["id", "DESC"]],
 		});
 
