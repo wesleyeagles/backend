@@ -199,3 +199,17 @@ export const getPosts = async (req: Request, res: Response) => {
 		res.status(500).json({ error: "Erro interno do servidor" });
 	}
 };
+
+export const getPostsDestaques = async (req: Request, res: Response) => {
+	try {
+		const posts = await Post.findAll({
+			limit: 2,
+			order: [["id", "DESC"]],
+		});
+
+		res.json(posts);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: "Erro interno do servidor" });
+	}
+};

@@ -240,6 +240,18 @@ var getPosts = (req, res) => __async(void 0, null, function* () {
     res.status(500).json({ error: "Erro interno do servidor" });
   }
 });
+var getPostsDestaques = (req, res) => __async(void 0, null, function* () {
+  try {
+    const posts = yield Post_default.findAll({
+      limit: 2,
+      order: [["id", "DESC"]]
+    });
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
 
 // routes/posts.ts
 var router = import_express.default.Router();
@@ -255,6 +267,7 @@ var storage = import_multer.default.diskStorage({
 var upload = (0, import_multer.default)({ storage });
 router.post("/criar-post", upload.single("imagem"), createPost);
 router.get("/ultimos-posts", getPosts);
+router.get("/ultimos-destaques", getPostsDestaques);
 router.delete("/deletar/:id", deletePost);
 router.get("/post/:id", getPostById);
 router.put("/post/editar/:id", upload.single("imagem"), editPost);
