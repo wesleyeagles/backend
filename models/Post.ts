@@ -22,6 +22,9 @@ Post.init(
 		imagem: {
 			type: DataTypes.BLOB,
 		},
+		destaque: {
+			type: DataTypes.TINYINT,
+		},
 	},
 	{
 		sequelize: db,
