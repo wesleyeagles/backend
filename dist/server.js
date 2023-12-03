@@ -104,6 +104,9 @@ Post.init(
     },
     imagem: {
       type: import_sequelize2.DataTypes.BLOB
+    },
+    destaque: {
+      type: import_sequelize2.DataTypes.TINYINT
     }
   },
   {
