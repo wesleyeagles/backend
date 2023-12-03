@@ -4,11 +4,10 @@ import { remove } from "remove-accents";
 import axios from "axios";
 import { Client } from "basic-ftp";
 import sharp from "sharp";
-import * as fs from "fs/promises"; // Importe a versão baseada em promises do módulo fs
 
 export const createPost = async (req: Request, res: Response) => {
 	try {
-		const { titulo, conteudo } = req.body;
+		const { titulo, conteudo, destaque } = req.body;
 
 		if (typeof titulo !== "string") {
 			return res.status(400).json({ error: "O título deve ser uma string válida." });
@@ -52,6 +51,7 @@ export const createPost = async (req: Request, res: Response) => {
 			titulo,
 			slug,
 			conteudo,
+			destaque,
 			imagem: req.file ? req.file.filename.replace(/\.[^.]+$/, ".webp") : null,
 		});
 
@@ -105,7 +105,7 @@ export const editPost = async (req: Request, res: Response) => {
 			return res.status(404).json({ error: "Postagem não encontrada" });
 		}
 
-		const { titulo, conteudo } = req.body;
+		const { titulo, conteudo, destaque } = req.body;
 		const slug = remove(titulo).toLowerCase().replace(/\s+/g, "-");
 
 		// Compare os valores existentes com os novos
@@ -113,6 +113,7 @@ export const editPost = async (req: Request, res: Response) => {
 			titulo === post.titulo &&
 			slug === post.slug &&
 			conteudo === post.conteudo &&
+			destaque === post.destaque &&
 			!req.file // Se não houver nova imagem
 		) {
 			// Se nada foi alterado, envie uma resposta indicando que nenhum dado foi modificado
@@ -123,6 +124,7 @@ export const editPost = async (req: Request, res: Response) => {
 		post.titulo = titulo;
 		post.slug = slug;
 		post.conteudo = conteudo;
+		post.destaque = destaque;
 
 		// Se uma nova imagem for fornecida, faça o processamento da imagem
 		if (req.file) {
