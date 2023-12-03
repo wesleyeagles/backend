@@ -32,6 +32,9 @@ User.init(
 			type: new DataTypes.STRING(128),
 			allowNull: false,
 		},
+		image: {
+			type: DataTypes.BLOB,
+		},
 	},
 	{
 		sequelize,

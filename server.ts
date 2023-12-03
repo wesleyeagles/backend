@@ -8,6 +8,7 @@ import contactFormRouter from "./routes/contactForm";
 import associatesRouter from "./routes/associates";
 import { authRouter } from "./routes/auth";
 import { userRouter } from "./routes/user";
+import eventRouter from "./routes/events";
 import { Sequelize } from "sequelize";
 
 const app = express();
@@ -54,6 +55,7 @@ app.use("/api/segments", segmentsRouter);
 app.use("/api/contact", contactFormRouter);
 app.use("/api/associates", associatesRouter);
 app.use("/api/user", userRouter);
+app.use("/api/event", eventRouter);
 
 app.listen(port, () => {
 	console.log(`Servidor rodando na porta ${port}`);

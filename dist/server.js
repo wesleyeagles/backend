@@ -60,7 +60,7 @@ var __async = (__this, __arguments, generator) => {
 };
 
 // server.ts
-var import_express8 = __toESM(require("express"));
+var import_express9 = __toESM(require("express"));
 var import_body_parser = __toESM(require("body-parser"));
 var import_cors = __toESM(require("cors"));
 
@@ -130,7 +130,6 @@ var createPost = (req, res) => __async(void 0, null, function* () {
       return res.status(400).json({ error: "J\xE1 existe um post com o mesmo t\xEDtulo." });
     }
     const slug = (0, import_remove_accents.remove)(titulo).toLowerCase().replace(/\s+/g, "-");
-    console.log(req.file);
     if (req.file) {
       const imagePath = req.file.path;
       const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
@@ -367,6 +366,38 @@ var import_express4 = __toESM(require("express"));
 
 // controllers/contactFormController.ts
 var import_nodemailer = __toESM(require("nodemailer"));
+
+// models/Contact.ts
+var import_sequelize5 = require("sequelize");
+var Contato = class extends import_sequelize5.Model {
+};
+Contato.init(
+  {
+    nome: {
+      type: import_sequelize5.DataTypes.STRING
+    },
+    email: {
+      type: import_sequelize5.DataTypes.STRING
+    },
+    assunto: {
+      type: import_sequelize5.DataTypes.STRING
+    },
+    mensagem: {
+      type: import_sequelize5.DataTypes.STRING
+    },
+    telefone: {
+      type: import_sequelize5.DataTypes.STRING
+    }
+  },
+  {
+    sequelize: db_default,
+    modelName: "contato"
+    // Nome da tabela no banco de dados
+  }
+);
+var Contact_default = Contato;
+
+// controllers/contactFormController.ts
 var transporter = import_nodemailer.default.createTransport({
   host: "mail.ibtec.org.br",
   port: 465,
@@ -375,8 +406,36 @@ var transporter = import_nodemailer.default.createTransport({
     pass: "Dev110591"
   }
 });
-var sendContactForm = (req, res) => {
-  const { Nome, Email, Telefone, Assunto, Mensagem } = req.body;
+var getAllContatos = (req, res) => __async(void 0, null, function* () {
+  try {
+    const contatos = yield Contact_default.findAll();
+    res.status(200).json(contatos);
+  } catch (error) {
+    console.error("Erro ao obter os contatos:", error);
+    res.status(500).json({ error: "Erro ao obter os contatos" });
+  }
+});
+var deletaContato = (req, res) => __async(void 0, null, function* () {
+  try {
+    const contatoId = Number(req.params.id);
+    const contato = yield Contact_default.findByPk(contatoId);
+    if (!contato) {
+      res.status(404).json({ error: "Contato n\xE3o encontrada" });
+      return;
+    }
+    yield contato.destroy();
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+var sendContactForm = (req, res) => __async(void 0, null, function* () {
+  const { nome, email, telefone, assunto, mensagem } = req.body;
+  const existingContact = yield Contact_default.findOne({ where: { email } });
+  if (existingContact) {
+    return res.status(400).json({ error: "J\xE1 existe um registro com esse email, por favor aguarde o contato." });
+  }
   const mailOptions = {
     from: "seu-email@gmail.com",
     to: "crafael.wesley@gmail.com",
@@ -387,11 +446,11 @@ var sendContactForm = (req, res) => {
         <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
           <div style="background-color: #ffffff; max-width: 600px; margin: 0 auto; padding: 20px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
             <h1 style="font-size: 24px; color: #333;">Detalhes do Contato</h1>
-            <p><strong>Nome:</strong> ${Nome}</p>
-            <p><strong>Email:</strong> ${Email}</p>
-            <p><strong>Telefone:</strong> ${Telefone}</p>
-            <p><strong>Assunto:</strong> ${Assunto}</p>
-            <p><strong>Mensagem:</strong> ${Mensagem}</p>
+            <p><strong>Nome:</strong> ${nome}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Telefone:</strong> ${telefone}</p>
+            <p><strong>Assunto:</strong> ${assunto}</p>
+            <p><strong>Mensagem:</strong> ${mensagem}</p>
           </div>
         </div>
       </body>
@@ -407,7 +466,15 @@ var sendContactForm = (req, res) => {
       res.status(200).send("Email enviado com sucesso");
     }
   });
-};
+  const newContato = yield Contact_default.create({
+    nome,
+    assunto,
+    telefone,
+    mensagem,
+    email
+  });
+  res.status(201).json(newContato);
+});
 var contactFormController_default = {
   sendContactForm
 };
@@ -415,64 +482,66 @@ var contactFormController_default = {
 // routes/contactForm.ts
 var router4 = import_express4.default.Router();
 router4.post("/enviar-formulario", contactFormController_default.sendContactForm);
+router4.delete("/deletar/:id", deletaContato);
+router4.get("/contatos", getAllContatos);
 var contactForm_default = router4;
 
 // routes/associates.ts
 var import_express5 = __toESM(require("express"));
 
 // models/Associate.ts
-var import_sequelize5 = require("sequelize");
+var import_sequelize6 = require("sequelize");
 var Associate = db_default.define(
   "associate",
   {
     id: {
-      type: import_sequelize5.DataTypes.NUMBER,
+      type: import_sequelize6.DataTypes.NUMBER,
       allowNull: false,
       primaryKey: true
     },
     segment_id: {
-      type: import_sequelize5.DataTypes.NUMBER,
+      type: import_sequelize6.DataTypes.NUMBER,
       allowNull: false
     },
     city_id: {
-      type: import_sequelize5.DataTypes.NUMBER,
+      type: import_sequelize6.DataTypes.NUMBER,
       allowNull: false
     },
     fantasy_name: {
-      type: import_sequelize5.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.STRING,
       allowNull: false
     },
     state: {
-      type: import_sequelize5.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.STRING,
       allowNull: false
     },
     address: {
-      type: import_sequelize5.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.STRING,
       allowNull: false
     },
     neighborhood: {
-      type: import_sequelize5.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.STRING,
       allowNull: false
     },
     zip_code: {
-      type: import_sequelize5.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.STRING,
       allowNull: false
     },
     phone: {
-      type: import_sequelize5.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.STRING,
       allowNull: false
     },
     website: {
-      type: import_sequelize5.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.STRING,
       allowNull: false
     },
     image: {
-      type: import_sequelize5.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.STRING,
       allowNull: false
     },
     // Outros campos do modelo Associate
     active: {
-      type: import_sequelize5.DataTypes.BOOLEAN,
+      type: import_sequelize6.DataTypes.BOOLEAN,
       defaultValue: true
     }
   },
@@ -509,31 +578,34 @@ var associates_default = router5;
 var import_express6 = require("express");
 
 // models/User.ts
-var import_sequelize6 = require("sequelize");
-var User = class extends import_sequelize6.Model {
+var import_sequelize7 = require("sequelize");
+var User = class extends import_sequelize7.Model {
 };
 User.init(
   {
     id: {
-      type: import_sequelize6.DataTypes.INTEGER,
+      type: import_sequelize7.DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
     role: {
-      type: new import_sequelize6.DataTypes.STRING(128),
+      type: new import_sequelize7.DataTypes.STRING(128),
       allowNull: false
     },
     name: {
-      type: new import_sequelize6.DataTypes.STRING(128),
+      type: new import_sequelize7.DataTypes.STRING(128),
       allowNull: false
     },
     email: {
-      type: new import_sequelize6.DataTypes.STRING(128),
+      type: new import_sequelize7.DataTypes.STRING(128),
       allowNull: false
     },
     password: {
-      type: new import_sequelize6.DataTypes.STRING(128),
+      type: new import_sequelize7.DataTypes.STRING(128),
       allowNull: false
+    },
+    image: {
+      type: import_sequelize7.DataTypes.BLOB
     }
   },
   {
@@ -579,32 +651,336 @@ authRouter.post("/login", AuthController.login);
 var import_express7 = require("express");
 
 // controllers/UserController.ts
-var UserController = class {
-  static getUserById(req, res) {
-    return __async(this, null, function* () {
-      const { id } = req.params;
-      try {
-        const user = yield User.findOne({ where: { id } });
-        if (!user) {
-          res.status(401).json({ message: "Usu\xE1rio n\xE3o encontrado" });
-          return;
-        }
-        res.json({ user }.user);
-      } catch (error) {
-        console.error("Erro no login:", error);
-        res.status(500).json({ message: "Erro no servidor" });
-      }
-    });
+var import_sharp2 = __toESM(require("sharp"));
+var import_basic_ftp2 = require("basic-ftp");
+var import_bcrypt2 = require("bcrypt");
+var getAllUsers = (req, res) => __async(void 0, null, function* () {
+  try {
+    const users = yield User.findAll();
+    res.json({ users });
+  } catch (error) {
+    console.error("Erro ao obter todos os usu\xE1rios:", error);
+    res.status(500).json({ message: "Erro no servidor" });
   }
-};
+});
+var getUserById = (req, res) => __async(void 0, null, function* () {
+  const { id } = req.params;
+  try {
+    const user = yield User.findOne({ where: { id } });
+    if (!user) {
+      res.status(401).json({ message: "Usu\xE1rio n\xE3o encontrado" });
+      return;
+    }
+    res.json({ user });
+  } catch (error) {
+    console.error("Erro no login:", error);
+    res.status(500).json({ message: "Erro no servidor" });
+  }
+});
+var createUser = (req, res) => __async(void 0, null, function* () {
+  const { name, email, password, role } = req.body;
+  try {
+    const existingUser = yield User.findOne({ where: { email } });
+    if (existingUser) {
+      res.status(404).json({ error: "J\xE1 existe um usu\xE1rio com este e-mail" });
+      return;
+    }
+    if (req.file) {
+      const imagePath = req.file.path;
+      const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
+      yield (0, import_sharp2.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+      const client = new import_basic_ftp2.Client();
+      yield client.access({
+        host: "ftp.ibtec.org.br",
+        user: "dev@dev.ibtec.org.br",
+        password: "Dev04121996"
+      });
+      yield client.uploadFrom(webpPath, "/blog/" + req.file.filename.replace(/\.[^.]+$/, ".webp"));
+      yield client.close();
+    }
+    const hashedPassword = yield (0, import_bcrypt2.hash)(password, 10);
+    const newUser = yield User.create({ name, email, password: hashedPassword, role, image: req.file ? req.file.filename.replace(/\.[^.]+$/, ".webp") : null });
+    res.status(201).json({ user: newUser });
+  } catch (error) {
+    console.error("Erro ao criar usu\xE1rio:", error);
+    res.status(500).json({ message: "Erro no servidor" });
+  }
+});
+var deleteUser = (req, res) => __async(void 0, null, function* () {
+  try {
+    const userId = Number(req.params.id);
+    const user = yield User.findByPk(userId);
+    if (!user) {
+      res.status(404).json({ error: "Usu\xE1rio n\xE3o encontrada" });
+      return;
+    }
+    yield user.destroy();
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+
+// middleware/uploadMiddleware.ts
+var import_multer2 = __toESM(require("multer"));
+var storage2 = import_multer2.default.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const fileName = Date.now() + "-" + file.originalname;
+    cb(null, fileName);
+  }
+});
+var upload2 = (0, import_multer2.default)({ storage: storage2 });
+var uploadMiddleware_default = upload2;
 
 // routes/user.ts
 var userRouter = (0, import_express7.Router)();
-userRouter.get("/usuario-por-id/:id", UserController.getUserById);
+userRouter.get("/usuario-por-id/:id", getUserById);
+userRouter.post("/criar-usuario", uploadMiddleware_default.single("image"), createUser);
+userRouter.get("/todos-usuarios", getAllUsers);
+userRouter.delete("/deletar/:id", deleteUser);
+
+// routes/events.ts
+var import_express8 = __toESM(require("express"));
+
+// models/Event.ts
+var import_sequelize8 = require("sequelize");
+var Event = class extends import_sequelize8.Model {
+};
+Event.init(
+  {
+    nome: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    slug: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    sobre: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    imagem: {
+      type: import_sequelize8.DataTypes.BLOB
+    },
+    publicoAlvo: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    cargaHoraria: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    horario: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    modalidade: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    local: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    data: {
+      type: import_sequelize8.DataTypes.DATE
+    },
+    link: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    facebook: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    instagram: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    linkedin: {
+      type: import_sequelize8.DataTypes.STRING
+    },
+    youtube: {
+      type: import_sequelize8.DataTypes.STRING
+    }
+  },
+  {
+    sequelize: db_default,
+    modelName: "evento"
+    // Nome da tabela no banco de dados
+  }
+);
+var Event_default = Event;
+
+// controllers/EventController.ts
+var import_remove_accents2 = require("remove-accents");
+var import_axios2 = __toESM(require("axios"));
+var import_basic_ftp3 = require("basic-ftp");
+var import_sharp3 = __toESM(require("sharp"));
+var createEvent = (req, res) => __async(void 0, null, function* () {
+  try {
+    const { nome, sobre, data, publicoAlvo, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+    console.log(req.body);
+    if (typeof nome !== "string") {
+      return res.status(400).json({ error: "O t\xEDtulo deve ser uma string v\xE1lida." });
+    }
+    const existingPost = yield Event_default.findOne({ where: { nome } });
+    if (existingPost) {
+      return res.status(400).json({ error: "J\xE1 existe um evento com o mesmo titulo." });
+    }
+    const slug = (0, import_remove_accents2.remove)(nome).toLowerCase().replace(/\s+/g, "-");
+    if (req.file) {
+      const imagePath = req.file.path;
+      const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
+      if (!imagePath.includes("webp")) {
+        yield (0, import_sharp3.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+      }
+      const client = new import_basic_ftp3.Client();
+      yield client.access({
+        host: "ftp.ibtec.org.br",
+        user: "dev@dev.ibtec.org.br",
+        password: "Dev04121996"
+      });
+      yield client.uploadFrom(webpPath, "/blog/" + req.file.filename.replace(/\.[^.]+$/, ".webp"));
+      yield client.close();
+    }
+    const newEvent = yield Event_default.create({
+      nome,
+      sobre,
+      data,
+      slug,
+      publicoAlvo,
+      cargaHoraria,
+      horario,
+      modalidade,
+      local,
+      link,
+      facebook,
+      instagram,
+      linkedin,
+      youtube,
+      imagem: req.file ? req.file.filename.replace(/\.[^.]+$/, ".webp") : null
+    });
+    res.status(201).json(newEvent);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+var editEvent = (req, res) => __async(void 0, null, function* () {
+  try {
+    const eventId = Number(req.params.id);
+    const event = yield Event_default.findByPk(eventId);
+    if (!event) {
+      return res.status(404).json({ error: "Evento n\xE3o encontrada" });
+    }
+    const { nome, sobre, data, publicoAlvo, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+    console.log(req.body);
+    const slug = (0, import_remove_accents2.remove)(nome).toLowerCase().replace(/\s+/g, "-");
+    if (nome === event.nome && slug === event.slug && sobre === event.sobre && data === event.data && publicoAlvo === event.publicoAlvo && cargaHoraria === event.cargaHoraria && horario === event.horario && modalidade === event.modalidade && local === event.local && link === event.link && facebook === event.facebook && instagram === event.instagram && linkedin === event.linkedin && youtube === event.youtube && !req.file) {
+      return res.status(200).json({ message: "Nenhum dado foi modificado." });
+    }
+    event.nome = nome;
+    event.slug = slug;
+    event.data = data;
+    event.publicoAlvo = publicoAlvo;
+    event.cargaHoraria = cargaHoraria;
+    event.horario = horario;
+    event.modalidade = modalidade;
+    event.local = local;
+    event.link = link;
+    event.facebook = facebook;
+    event.instagram = instagram;
+    event.linkedin = linkedin;
+    event.youtube = youtube;
+    if (req.file) {
+      const imagePath = req.file.path;
+      const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
+      yield (0, import_sharp3.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+      const client = new import_basic_ftp3.Client();
+      yield client.access({
+        host: "ftp.ibtec.org.br",
+        user: "dev@dev.ibtec.org.br",
+        password: "Dev04121996"
+      });
+      yield client.uploadFrom(webpPath, "/blog/" + req.file.filename.replace(/\.[^.]+$/, ".webp"));
+      yield client.close();
+      event.imagem = req.file.filename.replace(/\.[^.]+$/, ".webp");
+    }
+    yield event.save();
+    return res.json(event);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+var deleteEvento = (req, res) => __async(void 0, null, function* () {
+  try {
+    const eventId = Number(req.params.id);
+    const event = yield Event_default.findByPk(eventId);
+    if (!event) {
+      res.status(404).json({ error: "Evento n\xE3o encontrada" });
+      return;
+    }
+    yield event.destroy();
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+var getEventBySlug = (req, res) => __async(void 0, null, function* () {
+  try {
+    const eventSlug = req.params.slug;
+    const event = yield Event_default.findOne({ where: { slug: eventSlug } });
+    if (!event) {
+      res.status(404).json({ error: "Evento n\xE3o encontrado" });
+      return;
+    }
+    const remoteFileUrl = `https://dev.ibtec.org.br/dev/blog/${event.imagem}`;
+    const response = yield import_axios2.default.get(remoteFileUrl, { responseType: "arraybuffer" });
+    const imageBuffer = Buffer.from(response.data);
+    const originalImageBuffer = yield (0, import_sharp3.default)(imageBuffer).toBuffer();
+    res.json(__spreadProps(__spreadValues({}, event.toJSON()), {
+      originalImageBuffer
+    }));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+var getEvents = (req, res) => __async(void 0, null, function* () {
+  try {
+    const limit = req.query.limit;
+    const parsedLimit = limit ? parseInt(limit, 10) : void 0;
+    const events = yield Event_default.findAll({
+      limit: typeof parsedLimit === "number" ? parsedLimit : void 0,
+      order: [["id", "DESC"]]
+    });
+    res.json(events);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+
+// routes/events.ts
+var import_multer3 = __toESM(require("multer"));
+var router6 = import_express8.default.Router();
+var storage3 = import_multer3.default.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    cb(null, `${timestamp}-${file.originalname}`);
+  }
+});
+var upload3 = (0, import_multer3.default)({ storage: storage3 });
+router6.get("/ultimos-events", getEvents);
+router6.delete("/deletar/:id", deleteEvento);
+router6.post("/criar-evento", upload3.single("imagem"), createEvent);
+router6.put("/editar/:id", upload3.single("imagem"), editEvent);
+router6.get("/:slug", getEventBySlug);
+var events_default = router6;
 
 // server.ts
-var import_sequelize7 = require("sequelize");
-var app = (0, import_express8.default)();
+var import_sequelize9 = require("sequelize");
+var app = (0, import_express9.default)();
 var port = process.env.PORT || 3e3;
 app.use(import_body_parser.default.urlencoded({ extended: false }));
 app.use(import_body_parser.default.json());
@@ -613,7 +989,7 @@ app.use(
     origin: ["http://localhost:5173", "https://dev.ibtec.org.br"]
   })
 );
-var sequelize2 = new import_sequelize7.Sequelize({
+var sequelize2 = new import_sequelize9.Sequelize({
   dialect: "mysql",
   host: "server01.ibtec.org.br",
   username: "ctcca_dev",
@@ -642,6 +1018,7 @@ app.use("/api/segments", segments_default);
 app.use("/api/contact", contactForm_default);
 app.use("/api/associates", associates_default);
 app.use("/api/user", userRouter);
+app.use("/api/event", events_default);
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });

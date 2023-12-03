@@ -24,8 +24,6 @@ export const createPost = async (req: Request, res: Response) => {
 		// Gere o "slug" automaticamente com base no título
 		const slug = remove(titulo).toLowerCase().replace(/\s+/g, "-");
 
-		console.log(req.file);
-
 		// Realize a conversão para WebP antes da transferência FTP
 		if (req.file) {
 			const imagePath = req.file.path; // Caminho da imagem original
