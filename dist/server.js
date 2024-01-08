@@ -840,7 +840,8 @@ var createEvent = (req, res) => __async(void 0, null, function* () {
     const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
     console.log("Objetivos:", objetivos);
     const publicoAlvoString = publicoAlvo.join(", ");
-    const objetivosString = objetivos.join(", ");
+    const objetivosString = JSON.stringify(objetivos);
+    console.log("Ap\xF3s o Join:", objetivosString);
     if (typeof nome !== "string") {
       return res.status(400).json({ error: "O t\xEDtulo deve ser uma string v\xE1lida." });
     }

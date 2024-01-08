@@ -9,11 +9,12 @@ export const createEvent = async (req: Request, res: Response) => {
 	try {
 		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
 
-		console.log("Objetivos:", objetivos);  // Adicione este log para verificar os objetivos recebidos
-
+		console.log("Objetivos:", objetivos);
 
 		const publicoAlvoString = publicoAlvo.join(", ");
-		const objetivosString = objetivos.join(", ");
+		const objetivosString = JSON.stringify(objetivos); // Alteração aqui
+
+		console.log("Após o Join:", objetivosString);
 
 		if (typeof nome !== "string") {
 			return res.status(400).json({ error: "O título deve ser uma string válida." });
