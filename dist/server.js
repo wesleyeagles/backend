@@ -124,7 +124,7 @@ var import_basic_ftp = require("basic-ftp");
 var import_sharp = __toESM(require("sharp"));
 var createPost = (req, res) => __async(void 0, null, function* () {
   try {
-    const { titulo, conteudo } = req.body;
+    const { titulo, conteudo, destaque } = req.body;
     if (typeof titulo !== "string") {
       return res.status(400).json({ error: "O t\xEDtulo deve ser uma string v\xE1lida." });
     }
@@ -150,6 +150,7 @@ var createPost = (req, res) => __async(void 0, null, function* () {
       titulo,
       slug,
       conteudo,
+      destaque,
       imagem: req.file ? req.file.filename.replace(/\.[^.]+$/, ".webp") : null
     });
     res.status(201).json(newPost);
@@ -185,14 +186,15 @@ var editPost = (req, res) => __async(void 0, null, function* () {
     if (!post) {
       return res.status(404).json({ error: "Postagem n\xE3o encontrada" });
     }
-    const { titulo, conteudo } = req.body;
+    const { titulo, conteudo, destaque } = req.body;
     const slug = (0, import_remove_accents.remove)(titulo).toLowerCase().replace(/\s+/g, "-");
-    if (titulo === post.titulo && slug === post.slug && conteudo === post.conteudo && !req.file) {
+    if (titulo === post.titulo && slug === post.slug && conteudo === post.conteudo && destaque === post.destaque && !req.file) {
       return res.status(200).json({ message: "Nenhum dado foi modificado." });
     }
     post.titulo = titulo;
     post.slug = slug;
     post.conteudo = conteudo;
+    post.destaque = destaque;
     if (req.file) {
       const imagePath = req.file.path;
       const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
@@ -451,7 +453,7 @@ var deletaContato = (req, res) => __async(void 0, null, function* () {
   }
 });
 var sendContactForm = (req, res) => __async(void 0, null, function* () {
-  const { nome, email, telefone, assunto, mensagem } = req.body;
+  const { nome, email, telefone, assunto, empresa, mensagem } = req.body;
   const existingContact = yield Contact_default.findOne({ where: { email } });
   if (existingContact) {
     return res.status(400).json({ error: "J\xE1 existe um registro com esse email, por favor aguarde o contato." });
@@ -469,6 +471,7 @@ var sendContactForm = (req, res) => __async(void 0, null, function* () {
             <p><strong>Nome:</strong> ${nome}</p>
             <p><strong>Email:</strong> ${email}</p>
             <p><strong>Telefone:</strong> ${telefone}</p>
+			<p><strong>Empresa:</strong> ${empresa}</p>
             <p><strong>Assunto:</strong> ${assunto}</p>
             <p><strong>Mensagem:</strong> ${mensagem}</p>
           </div>
@@ -489,6 +492,7 @@ var sendContactForm = (req, res) => __async(void 0, null, function* () {
   const newContato = yield Contact_default.create({
     nome,
     assunto,
+    empresa,
     telefone,
     mensagem,
     email
@@ -833,8 +837,10 @@ var import_basic_ftp3 = require("basic-ftp");
 var import_sharp3 = __toESM(require("sharp"));
 var createEvent = (req, res) => __async(void 0, null, function* () {
   try {
-    const { nome, sobre, data, publicoAlvo, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
-    console.log(req.body);
+    const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+    console.log("Objetivos:", objetivos);
+    const publicoAlvoString = publicoAlvo.join(", ");
+    const objetivosString = objetivos.join(", ");
     if (typeof nome !== "string") {
       return res.status(400).json({ error: "O t\xEDtulo deve ser uma string v\xE1lida." });
     }
@@ -863,7 +869,8 @@ var createEvent = (req, res) => __async(void 0, null, function* () {
       sobre,
       data,
       slug,
-      publicoAlvo,
+      publicoAlvo: publicoAlvoString,
+      objetivos: objetivosString,
       cargaHoraria,
       horario,
       modalidade,
@@ -888,16 +895,19 @@ var editEvent = (req, res) => __async(void 0, null, function* () {
     if (!event) {
       return res.status(404).json({ error: "Evento n\xE3o encontrada" });
     }
-    const { nome, sobre, data, publicoAlvo, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+    const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+    const publicoAlvoString = publicoAlvo.join(", ");
+    const objetivosString = objetivos.join(", ");
     console.log(req.body);
     const slug = (0, import_remove_accents2.remove)(nome).toLowerCase().replace(/\s+/g, "-");
-    if (nome === event.nome && slug === event.slug && sobre === event.sobre && data === event.data && publicoAlvo === event.publicoAlvo && cargaHoraria === event.cargaHoraria && horario === event.horario && modalidade === event.modalidade && local === event.local && link === event.link && facebook === event.facebook && instagram === event.instagram && linkedin === event.linkedin && youtube === event.youtube && !req.file) {
+    if (nome === event.nome && slug === event.slug && sobre === event.sobre && data === event.data && publicoAlvo === event.publicoAlvo && objetivos === event.objetivos && cargaHoraria === event.cargaHoraria && horario === event.horario && modalidade === event.modalidade && local === event.local && link === event.link && facebook === event.facebook && instagram === event.instagram && linkedin === event.linkedin && youtube === event.youtube && !req.file) {
       return res.status(200).json({ message: "Nenhum dado foi modificado." });
     }
     event.nome = nome;
     event.slug = slug;
     event.data = data;
-    event.publicoAlvo = publicoAlvo;
+    event.publicoAlvo = publicoAlvoString;
+    event.objetivos = objetivosString;
     event.cargaHoraria = cargaHoraria;
     event.horario = horario;
     event.modalidade = modalidade;

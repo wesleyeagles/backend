@@ -9,7 +9,8 @@ export const createEvent = async (req: Request, res: Response) => {
 	try {
 		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
 
-		console.log(req.body);
+		console.log("Objetivos:", objetivos);  // Adicione este log para verificar os objetivos recebidos
+
 
 		const publicoAlvoString = publicoAlvo.join(", ");
 		const objetivosString = objetivos.join(", ");
