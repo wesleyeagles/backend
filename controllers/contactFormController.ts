@@ -45,7 +45,7 @@ export const deletaContato = async (req: Request, res: Response): Promise<void> 
 };
 
 const sendContactForm = async (req: Request, res: Response) => {
-	const { nome, email, telefone, assunto, mensagem } = req.body;
+	const { nome, email, telefone, assunto, empresa, mensagem } = req.body;
 
 	const existingContact = await Contato.findOne({ where: { email } });
 
@@ -66,6 +66,7 @@ const sendContactForm = async (req: Request, res: Response) => {
             <p><strong>Nome:</strong> ${nome}</p>
             <p><strong>Email:</strong> ${email}</p>
             <p><strong>Telefone:</strong> ${telefone}</p>
+			<p><strong>Empresa:</strong> ${empresa}</p>
             <p><strong>Assunto:</strong> ${assunto}</p>
             <p><strong>Mensagem:</strong> ${mensagem}</p>
           </div>
@@ -89,6 +90,7 @@ const sendContactForm = async (req: Request, res: Response) => {
 	const newContato = await Contato.create({
 		nome,
 		assunto,
+		empresa,
 		telefone,
 		mensagem,
 		email,
