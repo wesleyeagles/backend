@@ -8,6 +8,7 @@ class Event extends Model {
 	public imagem!: string;
 	public data!: Date;
 	public publicoAlvo!: string;
+	public objetivos!: string;
 	public cargaHoraria!: string;
 	public horario!: string | null;
 	public modalidade!: string;

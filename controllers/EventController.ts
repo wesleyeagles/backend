@@ -7,7 +7,7 @@ import sharp from "sharp";
 
 export const createEvent = async (req: Request, res: Response) => {
 	try {
-		const { nome, sobre, data, publicoAlvo, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
 
 		console.log(req.body);
 
@@ -57,6 +57,7 @@ export const createEvent = async (req: Request, res: Response) => {
 			data,
 			slug,
 			publicoAlvo,
+			objetivos,
 			cargaHoraria,
 			horario,
 			modalidade,
@@ -85,7 +86,7 @@ export const editEvent = async (req: Request, res: Response) => {
 			return res.status(404).json({ error: "Evento não encontrada" });
 		}
 
-		const { nome, sobre, data, publicoAlvo, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
 
 		console.log(req.body);
 		const slug = remove(nome).toLowerCase().replace(/\s+/g, "-");
@@ -97,6 +98,7 @@ export const editEvent = async (req: Request, res: Response) => {
 			sobre === event.sobre &&
 			data === event.data &&
 			publicoAlvo === event.publicoAlvo &&
+			objetivos === event.objetivos &&
 			cargaHoraria === event.cargaHoraria &&
 			horario === event.horario &&
 			modalidade === event.modalidade &&
@@ -117,6 +119,7 @@ export const editEvent = async (req: Request, res: Response) => {
 		event.slug = slug;
 		event.data = data;
 		event.publicoAlvo = publicoAlvo;
+		event.objetivos = objetivos;
 		event.cargaHoraria = cargaHoraria;
 		event.horario = horario;
 		event.modalidade = modalidade;
