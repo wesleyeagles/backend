@@ -841,7 +841,6 @@ var import_sharp3 = __toESM(require("sharp"));
 var createEvent = (req, res) => __async(void 0, null, function* () {
   try {
     const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
-    console.log("Objetivos:", objetivos);
     const publicoAlvoString = publicoAlvo.join(", ");
     const objetivosString = objetivos.join(", ");
     if (typeof nome !== "string") {

@@ -9,8 +9,6 @@ export const createEvent = async (req: Request, res: Response) => {
 	try {
 		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
 
-		console.log("Objetivos:", objetivos);
-
 		const publicoAlvoString = publicoAlvo.join(", ");
 		const objetivosString = objetivos.join(", ");
 
