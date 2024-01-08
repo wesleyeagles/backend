@@ -37,6 +37,9 @@ Event.init(
 		publicoAlvo: {
 			type: DataTypes.STRING,
 		},
+		objetivos: {
+			type: DataTypes.STRING,
+		},
 		cargaHoraria: {
 			type: DataTypes.STRING,
 		},
