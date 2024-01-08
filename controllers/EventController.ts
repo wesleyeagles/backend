@@ -11,6 +11,9 @@ export const createEvent = async (req: Request, res: Response) => {
 
 		console.log(req.body);
 
+		const publicoAlvoString = publicoAlvo.join(", ");
+		const objetivosString = objetivos.join(", ");
+
 		if (typeof nome !== "string") {
 			return res.status(400).json({ error: "O título deve ser uma string válida." });
 		}
@@ -56,8 +59,8 @@ export const createEvent = async (req: Request, res: Response) => {
 			sobre,
 			data,
 			slug,
-			publicoAlvo,
-			objetivos,
+			publicoAlvo: publicoAlvoString,
+			objetivos: objetivosString,
 			cargaHoraria,
 			horario,
 			modalidade,
@@ -87,6 +90,9 @@ export const editEvent = async (req: Request, res: Response) => {
 		}
 
 		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+
+		const publicoAlvoString = publicoAlvo.join(", ");
+		const objetivosString = objetivos.join(", ");
 
 		console.log(req.body);
 		const slug = remove(nome).toLowerCase().replace(/\s+/g, "-");
@@ -118,8 +124,8 @@ export const editEvent = async (req: Request, res: Response) => {
 		event.nome = nome;
 		event.slug = slug;
 		event.data = data;
-		event.publicoAlvo = publicoAlvo;
-		event.objetivos = objetivos;
+		event.publicoAlvo = publicoAlvoString;
+		event.objetivos = objetivosString;
 		event.cargaHoraria = cargaHoraria;
 		event.horario = horario;
 		event.modalidade = modalidade;
