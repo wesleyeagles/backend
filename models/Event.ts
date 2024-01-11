@@ -9,6 +9,7 @@ class Event extends Model {
 	public data!: Date;
 	public publicoAlvo!: string;
 	public objetivos!: string;
+	public tematicas!: string;
 	public cargaHoraria!: string;
 	public horario!: string | null;
 	public modalidade!: string;
@@ -38,6 +39,9 @@ Event.init(
 			type: DataTypes.STRING,
 		},
 		objetivos: {
+			type: DataTypes.STRING,
+		},
+		tematicas: {
 			type: DataTypes.STRING,
 		},
 		cargaHoraria: {

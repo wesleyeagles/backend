@@ -7,10 +7,11 @@ import sharp from "sharp";
 
 export const createEvent = async (req: Request, res: Response) => {
 	try {
-		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube, tematicas } = req.body;
 
 		const publicoAlvoString = publicoAlvo.join(", ");
 		const objetivosString = objetivos.join(", ");
+		const tematicasString = tematicas.join(", ");
 
 		if (typeof nome !== "string") {
 			return res.status(400).json({ error: "O título deve ser uma string válida." });
@@ -59,6 +60,7 @@ export const createEvent = async (req: Request, res: Response) => {
 			slug,
 			publicoAlvo: publicoAlvoString,
 			objetivos: objetivosString,
+			tematicas: tematicasString,
 			cargaHoraria,
 			horario,
 			modalidade,
