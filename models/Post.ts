@@ -3,6 +3,7 @@ import db from "../config/db"; // Importe a instância do Sequelize
 
 class Post extends Model {
 	public titulo!: string;
+	public tipo!: string;
 	public slug!: string;
 	public destaque!: number;
 	public conteudo!: string[];
@@ -15,6 +16,9 @@ Post.init(
 			type: DataTypes.STRING,
 		},
 		titulo: {
+			type: DataTypes.STRING,
+		},
+		tipo: {
 			type: DataTypes.STRING,
 		},
 		conteudo: {

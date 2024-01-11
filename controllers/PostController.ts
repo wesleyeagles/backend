@@ -7,7 +7,7 @@ import sharp from "sharp";
 
 export const createPost = async (req: Request, res: Response) => {
 	try {
-		const { titulo, conteudo, destaque } = req.body;
+		const { titulo, conteudo, destaque, tipo } = req.body;
 
 		if (typeof titulo !== "string") {
 			return res.status(400).json({ error: "O título deve ser uma string válida." });
@@ -50,6 +50,7 @@ export const createPost = async (req: Request, res: Response) => {
 		const newPost = await Post.create({
 			titulo,
 			slug,
+			tipo,
 			conteudo,
 			destaque,
 			imagem: req.file ? req.file.filename.replace(/\.[^.]+$/, ".webp") : null,
@@ -105,12 +106,13 @@ export const editPost = async (req: Request, res: Response) => {
 			return res.status(404).json({ error: "Postagem não encontrada" });
 		}
 
-		const { titulo, conteudo, destaque } = req.body;
+		const { titulo, conteudo, destaque, tipo } = req.body;
 		const slug = remove(titulo).toLowerCase().replace(/\s+/g, "-");
 
 		// Compare os valores existentes com os novos
 		if (
 			titulo === post.titulo &&
+			tipo === post.tipo &&
 			slug === post.slug &&
 			conteudo === post.conteudo &&
 			destaque === post.destaque &&
@@ -122,6 +124,7 @@ export const editPost = async (req: Request, res: Response) => {
 
 		// Atualize os campos relevantes da postagem
 		post.titulo = titulo;
+		post.tipo = tipo;
 		post.slug = slug;
 		post.conteudo = conteudo;
 		post.destaque = destaque;
