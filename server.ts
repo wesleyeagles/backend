@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 
 app.use(
 	cors({
-		origin: ["http://localhost:5173", "https://dev.ibtec.org.br", "https://ibtec.org.br"],
+		origin: ["http://localhost:5173", "https://dev.ibtec.org.br", "https://ibtec.org.br", "192.168.1.7:5173"],
 	})
 );
 
