@@ -54,8 +54,9 @@ const sendContactForm = async (req: Request, res: Response) => {
 	}
 
 	const mailOptions = {
-		from: "seu-email@gmail.com",
-		to: "crafael.wesley@gmail.com",
+		from: "ibtec@ibtec.org.br",
+		sender: "ibtec@ibtec.org.br",
+		to: "ibtec@ibtec.org.br",
 		subject: "Mensagem do formulário de contato",
 		html: `
       <html>
