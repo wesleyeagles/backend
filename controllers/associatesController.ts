@@ -7,6 +7,8 @@ export const createAssociate = async (req: Request, res: Response) => {
 	try {
 		const { segment_id, city_id, fantasy_name, state, address, neighborhood, zip_code, phone, website } = req.body;
 
+		console.log(req.body);
+
 		// Verifique se já existe um post com o mesmo título no banco de dados
 		const existingPost = await Associate.findOne({ where: { fantasy_name } });
 

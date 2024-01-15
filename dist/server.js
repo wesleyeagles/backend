@@ -587,6 +587,7 @@ var import_sharp2 = __toESM(require("sharp"));
 var createAssociate = (req, res) => __async(void 0, null, function* () {
   try {
     const { segment_id, city_id, fantasy_name, state, address, neighborhood, zip_code, phone, website } = req.body;
+    console.log(req.body);
     const existingPost = yield Associate_default.findOne({ where: { fantasy_name } });
     if (existingPost) {
       return res.status(400).json({ error: "J\xE1 existe um associado com o mesmo nome." });
