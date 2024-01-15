@@ -524,11 +524,6 @@ var import_sequelize6 = require("sequelize");
 var Associate = db_default.define(
   "associate",
   {
-    id: {
-      type: import_sequelize6.DataTypes.NUMBER,
-      allowNull: false,
-      primaryKey: true
-    },
     segment_id: {
       type: import_sequelize6.DataTypes.NUMBER,
       allowNull: false

@@ -4,11 +4,6 @@ import sequelize from "../config/db";
 const Associate = sequelize.define(
 	"associate",
 	{
-		id: {
-			type: DataTypes.NUMBER,
-			allowNull: false,
-			primaryKey: true,
-		},
 		segment_id: {
 			type: DataTypes.NUMBER,
 			allowNull: false,
