@@ -99,6 +99,9 @@ Post.init(
     titulo: {
       type: import_sequelize2.DataTypes.STRING
     },
+    tipo: {
+      type: import_sequelize2.DataTypes.STRING
+    },
     conteudo: {
       type: import_sequelize2.DataTypes.TEXT
     },
@@ -124,7 +127,7 @@ var import_basic_ftp = require("basic-ftp");
 var import_sharp = __toESM(require("sharp"));
 var createPost = (req, res) => __async(void 0, null, function* () {
   try {
-    const { titulo, conteudo, destaque } = req.body;
+    const { titulo, conteudo, destaque, tipo } = req.body;
     if (typeof titulo !== "string") {
       return res.status(400).json({ error: "O t\xEDtulo deve ser uma string v\xE1lida." });
     }
@@ -149,6 +152,7 @@ var createPost = (req, res) => __async(void 0, null, function* () {
     const newPost = yield Post_default.create({
       titulo,
       slug,
+      tipo,
       conteudo,
       destaque,
       imagem: req.file ? req.file.filename.replace(/\.[^.]+$/, ".webp") : null
@@ -186,12 +190,13 @@ var editPost = (req, res) => __async(void 0, null, function* () {
     if (!post) {
       return res.status(404).json({ error: "Postagem n\xE3o encontrada" });
     }
-    const { titulo, conteudo, destaque } = req.body;
+    const { titulo, conteudo, destaque, tipo } = req.body;
     const slug = (0, import_remove_accents.remove)(titulo).toLowerCase().replace(/\s+/g, "-");
-    if (titulo === post.titulo && slug === post.slug && conteudo === post.conteudo && destaque === post.destaque && !req.file) {
+    if (titulo === post.titulo && tipo === post.tipo && slug === post.slug && conteudo === post.conteudo && destaque === post.destaque && !req.file) {
       return res.status(200).json({ message: "Nenhum dado foi modificado." });
     }
     post.titulo = titulo;
+    post.tipo = tipo;
     post.slug = slug;
     post.conteudo = conteudo;
     post.destaque = destaque;
@@ -459,8 +464,9 @@ var sendContactForm = (req, res) => __async(void 0, null, function* () {
     return res.status(400).json({ error: "J\xE1 existe um registro com esse email, por favor aguarde o contato." });
   }
   const mailOptions = {
-    from: "seu-email@gmail.com",
-    to: "crafael.wesley@gmail.com",
+    from: "ibtec@ibtec.org.br",
+    sender: "ibtec@ibtec.org.br",
+    to: "ibtec@ibtec.org.br",
     subject: "Mensagem do formul\xE1rio de contato",
     html: `
       <html>
@@ -560,7 +566,7 @@ var Associate = db_default.define(
       allowNull: false
     },
     image: {
-      type: import_sequelize6.DataTypes.STRING,
+      type: import_sequelize6.DataTypes.BLOB,
       allowNull: false
     },
     // Outros campos do modelo Associate
@@ -576,6 +582,48 @@ var Associate = db_default.define(
 var Associate_default = Associate;
 
 // controllers/associatesController.ts
+var import_basic_ftp2 = require("basic-ftp");
+var import_sharp2 = __toESM(require("sharp"));
+var createAssociate = (req, res) => __async(void 0, null, function* () {
+  try {
+    const { segment_id, city_id, fantasy_name, state, address, neighborhood, zip_code, phone, website } = req.body;
+    if (typeof fantasy_name !== "string") {
+      return res.status(400).json({ error: "O nome deve ser uma string v\xE1lida." });
+    }
+    const existingPost = yield Associate_default.findOne({ where: { fantasy_name } });
+    if (existingPost) {
+      return res.status(400).json({ error: "J\xE1 existe um associado com o mesmo nome." });
+    }
+    if (req.file) {
+      const imagePath = req.file.path;
+      const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
+      yield (0, import_sharp2.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+      const client = new import_basic_ftp2.Client();
+      yield client.access({
+        host: "ftp.ibtec.org.br",
+        user: "dev@dev.ibtec.org.br",
+        password: "Dev04121996"
+      });
+      yield client.uploadFrom(webpPath, "/blog/" + req.file.filename.replace(/\.[^.]+$/, ".webp"));
+      yield client.close();
+    }
+    const newPost = yield Associate_default.create({
+      segment_id,
+      city_id,
+      state,
+      address,
+      neighborhood,
+      zip_code,
+      phone,
+      website,
+      image: req.file ? req.file.filename.replace(/\.[^.]+$/, ".webp") : null
+    });
+    res.status(201).json(newPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
 var getAllAssociates = (req, res) => __async(void 0, null, function* () {
   try {
     const associates = yield Associate_default.findAll({
@@ -596,6 +644,7 @@ var associatesController_default = {
 // routes/associates.ts
 var router5 = import_express5.default.Router();
 router5.get("/todos-associados", associatesController_default.getAllAssociates);
+router5.post("/criar-associado", createAssociate);
 var associates_default = router5;
 
 // routes/auth.ts
@@ -675,8 +724,8 @@ authRouter.post("/login", AuthController.login);
 var import_express7 = require("express");
 
 // controllers/UserController.ts
-var import_sharp2 = __toESM(require("sharp"));
-var import_basic_ftp2 = require("basic-ftp");
+var import_sharp3 = __toESM(require("sharp"));
+var import_basic_ftp3 = require("basic-ftp");
 var import_bcrypt2 = require("bcrypt");
 var getAllUsers = (req, res) => __async(void 0, null, function* () {
   try {
@@ -712,8 +761,8 @@ var createUser = (req, res) => __async(void 0, null, function* () {
     if (req.file) {
       const imagePath = req.file.path;
       const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
-      yield (0, import_sharp2.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
-      const client = new import_basic_ftp2.Client();
+      yield (0, import_sharp3.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+      const client = new import_basic_ftp3.Client();
       yield client.access({
         host: "ftp.ibtec.org.br",
         user: "dev@dev.ibtec.org.br",
@@ -794,6 +843,9 @@ Event.init(
     objetivos: {
       type: import_sequelize8.DataTypes.STRING
     },
+    tematicas: {
+      type: import_sequelize8.DataTypes.STRING
+    },
     cargaHoraria: {
       type: import_sequelize8.DataTypes.STRING
     },
@@ -836,13 +888,14 @@ var Event_default = Event;
 // controllers/EventController.ts
 var import_remove_accents2 = require("remove-accents");
 var import_axios2 = __toESM(require("axios"));
-var import_basic_ftp3 = require("basic-ftp");
-var import_sharp3 = __toESM(require("sharp"));
+var import_basic_ftp4 = require("basic-ftp");
+var import_sharp4 = __toESM(require("sharp"));
 var createEvent = (req, res) => __async(void 0, null, function* () {
   try {
-    const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+    const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube, tematicas } = req.body;
     const publicoAlvoString = publicoAlvo.join(", ");
     const objetivosString = objetivos.join(", ");
+    const tematicasString = tematicas.join(", ");
     if (typeof nome !== "string") {
       return res.status(400).json({ error: "O t\xEDtulo deve ser uma string v\xE1lida." });
     }
@@ -855,9 +908,9 @@ var createEvent = (req, res) => __async(void 0, null, function* () {
       const imagePath = req.file.path;
       const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
       if (!imagePath.includes("webp")) {
-        yield (0, import_sharp3.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+        yield (0, import_sharp4.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
       }
-      const client = new import_basic_ftp3.Client();
+      const client = new import_basic_ftp4.Client();
       yield client.access({
         host: "ftp.ibtec.org.br",
         user: "dev@dev.ibtec.org.br",
@@ -873,6 +926,7 @@ var createEvent = (req, res) => __async(void 0, null, function* () {
       slug,
       publicoAlvo: publicoAlvoString,
       objetivos: objetivosString,
+      tematicas: tematicasString,
       cargaHoraria,
       horario,
       modalidade,
@@ -922,8 +976,8 @@ var editEvent = (req, res) => __async(void 0, null, function* () {
     if (req.file) {
       const imagePath = req.file.path;
       const webpPath = imagePath.replace(/\.[^.]+$/, ".webp");
-      yield (0, import_sharp3.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
-      const client = new import_basic_ftp3.Client();
+      yield (0, import_sharp4.default)(imagePath).webp({ quality: 90 }).toFile(webpPath);
+      const client = new import_basic_ftp4.Client();
       yield client.access({
         host: "ftp.ibtec.org.br",
         user: "dev@dev.ibtec.org.br",
@@ -966,7 +1020,7 @@ var getEventBySlug = (req, res) => __async(void 0, null, function* () {
     const remoteFileUrl = `https://dev.ibtec.org.br/dev/blog/${event.imagem}`;
     const response = yield import_axios2.default.get(remoteFileUrl, { responseType: "arraybuffer" });
     const imageBuffer = Buffer.from(response.data);
-    const originalImageBuffer = yield (0, import_sharp3.default)(imageBuffer).toBuffer();
+    const originalImageBuffer = yield (0, import_sharp4.default)(imageBuffer).toBuffer();
     res.json(__spreadProps(__spreadValues({}, event.toJSON()), {
       originalImageBuffer
     }));
@@ -1018,7 +1072,7 @@ app.use(import_body_parser.default.urlencoded({ extended: false }));
 app.use(import_body_parser.default.json());
 app.use(
   (0, import_cors.default)({
-    origin: ["http://localhost:5173", "https://dev.ibtec.org.br"]
+    origin: ["http://localhost:5173", "https://dev.ibtec.org.br", "https://ibtec.org.br", "https://www.ibtec.org.br", "https://ibtec.vercel.app"]
   })
 );
 var sequelize2 = new import_sequelize9.Sequelize({

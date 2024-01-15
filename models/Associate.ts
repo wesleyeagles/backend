@@ -46,7 +46,7 @@ const Associate = sequelize.define(
 			allowNull: false,
 		},
 		image: {
-			type: DataTypes.STRING,
+			type: DataTypes.BLOB,
 			allowNull: false,
 		},
 		// Outros campos do modelo Associate
