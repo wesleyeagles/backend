@@ -61,7 +61,6 @@ var __async = (__this, __arguments, generator) => {
 
 // server.ts
 var import_express9 = __toESM(require("express"));
-var import_body_parser = __toESM(require("body-parser"));
 var import_cors = __toESM(require("cors"));
 
 // routes/posts.ts
@@ -1076,8 +1075,8 @@ var events_default = router6;
 var import_sequelize9 = require("sequelize");
 var app = (0, import_express9.default)();
 var port = process.env.PORT || 3e3;
-app.use(import_body_parser.default.urlencoded({ extended: false }));
-app.use(import_body_parser.default.json());
+app.use(import_express9.default.urlencoded({ extended: false }));
+app.use(import_express9.default.json());
 app.use(
   (0, import_cors.default)({
     origin: ["http://localhost:5173", "https://dev.ibtec.org.br", "https://ibtec.org.br", "https://www.ibtec.org.br", "https://ibtec.vercel.app"]

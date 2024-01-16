@@ -1,5 +1,4 @@
 import express from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
 import postsRouter from "./routes/posts";
 import citiesRouter from "./routes/cities";
@@ -14,8 +13,8 @@ import { Sequelize } from "sequelize";
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 app.use(
 	cors({
