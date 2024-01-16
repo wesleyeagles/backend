@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Post from "../models/Post";
+import PostAntigo from "../models/PostAntigo";
 import { remove } from "remove-accents";
 import axios from "axios";
 import { Client } from "basic-ftp";
@@ -194,6 +195,23 @@ export const getPosts = async (req: Request, res: Response) => {
 		const parsedLimit = limit ? parseInt(limit, 10) : undefined; // Mantenha como undefined se não houver limite
 
 		const posts = await Post.findAll({
+			limit: typeof parsedLimit === "number" ? parsedLimit : undefined,
+			order: [["id", "DESC"]],
+		});
+
+		res.json(posts);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: "Erro interno do servidor" });
+	}
+};
+
+export const getPostsAntigos = async (req: Request, res: Response) => {
+	try {
+		const limit = req.query.limit as string | undefined;
+		const parsedLimit = limit ? parseInt(limit, 10) : undefined; // Mantenha como undefined se não houver limite
+
+		const posts = await PostAntigo.findAll({
 			limit: typeof parsedLimit === "number" ? parsedLimit : undefined,
 			order: [["id", "DESC"]],
 		});
