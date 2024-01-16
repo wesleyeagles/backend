@@ -5,6 +5,7 @@ import { remove } from "remove-accents";
 import axios from "axios";
 import { Client } from "basic-ftp";
 import sharp from "sharp";
+import { Op } from "sequelize";
 
 export const createPost = async (req: Request, res: Response) => {
 	try {
@@ -214,6 +215,11 @@ export const getPostsAntigos = async (req: Request, res: Response) => {
 		const posts = await PostAntigo.findAll({
 			limit: typeof parsedLimit === "number" ? parsedLimit : undefined,
 			order: [["id", "DESC"]],
+			where: {
+				created_at: {
+					[Op.between]: [new Date("2023-01-01"), new Date("2023-12-31 23:59:59.999")],
+				},
+			},
 		});
 
 		res.json(posts);
