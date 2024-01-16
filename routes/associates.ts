@@ -1,5 +1,5 @@
 import express from "express";
-import associatesController, { createAssociate } from "../controllers/associatesController";
+import associatesController, { createAssociate, deleteAssociate } from "../controllers/associatesController";
 import multer from "multer";
 
 const router = express.Router();
@@ -17,6 +17,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post("/criar-associado", upload.single("image"), createAssociate);
+
+router.delete("/deletar/:id", deleteAssociate);
 
 router.get("/todos-associados", associatesController.getAllAssociates);
 

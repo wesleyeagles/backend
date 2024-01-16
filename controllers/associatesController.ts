@@ -60,6 +60,27 @@ export const createAssociate = async (req: Request, res: Response) => {
 	}
 };
 
+export const deleteAssociate = async (req: Request, res: Response): Promise<void> => {
+	try {
+		const postId = Number(req.params.id); // Obtenha o ID da notícia a ser excluída dos parâmetros da URL
+
+		// Use o Sequelize para buscar a notícia pelo ID e excluí-la
+		const post = await Associate.findByPk(postId);
+
+		if (!post) {
+			res.status(404).json({ error: "Associado não encontrada" });
+			return;
+		}
+
+		await post.destroy(); // Exclua a notícia
+
+		res.status(204).end(); // Responda com um status 204 (No Content) para indicar sucesso na exclusão
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: "Erro interno do servidor" });
+	}
+};
+
 const getAllAssociates = async (req: Request, res: Response) => {
 	try {
 		const associates = await Associate.findAll({
