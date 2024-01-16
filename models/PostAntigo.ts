@@ -18,11 +18,17 @@ Post.init(
 		image: {
 			type: DataTypes.BLOB,
 		},
+		created_at: {
+			type: DataTypes.STRING,
+		},
+		updated_at: {
+			type: DataTypes.STRING,
+		},
 	},
 	{
 		sequelize: db,
 		modelName: "new", // Nome da tabela no banco de dados
-		timestamps: true,
+		timestamps: false,
 	}
 );
 
