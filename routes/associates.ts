@@ -16,8 +16,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.get("/todos-associados", associatesController.getAllAssociates);
-
 router.post("/criar-associado", upload.single("image"), createAssociate);
+
+router.get("/todos-associados", associatesController.getAllAssociates);
 
 export default router;
