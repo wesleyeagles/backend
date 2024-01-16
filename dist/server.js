@@ -639,9 +639,20 @@ var associatesController_default = {
 };
 
 // routes/associates.ts
+var import_multer2 = __toESM(require("multer"));
 var router5 = import_express5.default.Router();
+var storage2 = import_multer2.default.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    cb(null, `${timestamp}-${file.originalname}`);
+  }
+});
+var upload2 = (0, import_multer2.default)({ storage: storage2 });
 router5.get("/todos-associados", associatesController_default.getAllAssociates);
-router5.post("/criar-associado", createAssociate);
+router5.post("/criar-associado", upload2.single("imagem"), createAssociate);
 var associates_default = router5;
 
 // routes/auth.ts
@@ -793,8 +804,8 @@ var deleteUser = (req, res) => __async(void 0, null, function* () {
 });
 
 // middleware/uploadMiddleware.ts
-var import_multer2 = __toESM(require("multer"));
-var storage2 = import_multer2.default.diskStorage({
+var import_multer3 = __toESM(require("multer"));
+var storage3 = import_multer3.default.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
@@ -803,8 +814,8 @@ var storage2 = import_multer2.default.diskStorage({
     cb(null, fileName);
   }
 });
-var upload2 = (0, import_multer2.default)({ storage: storage2 });
-var uploadMiddleware_default = upload2;
+var upload3 = (0, import_multer3.default)({ storage: storage3 });
+var uploadMiddleware_default = upload3;
 
 // routes/user.ts
 var userRouter = (0, import_express7.Router)();
@@ -1042,9 +1053,9 @@ var getEvents = (req, res) => __async(void 0, null, function* () {
 });
 
 // routes/events.ts
-var import_multer3 = __toESM(require("multer"));
+var import_multer4 = __toESM(require("multer"));
 var router6 = import_express8.default.Router();
-var storage3 = import_multer3.default.diskStorage({
+var storage4 = import_multer4.default.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
@@ -1053,11 +1064,11 @@ var storage3 = import_multer3.default.diskStorage({
     cb(null, `${timestamp}-${file.originalname}`);
   }
 });
-var upload3 = (0, import_multer3.default)({ storage: storage3 });
+var upload4 = (0, import_multer4.default)({ storage: storage4 });
 router6.get("/ultimos-events", getEvents);
 router6.delete("/deletar/:id", deleteEvento);
-router6.post("/criar-evento", upload3.single("imagem"), createEvent);
-router6.put("/editar/:id", upload3.single("imagem"), editEvent);
+router6.post("/criar-evento", upload4.single("imagem"), createEvent);
+router6.put("/editar/:id", upload4.single("imagem"), editEvent);
 router6.get("/:slug", getEventBySlug);
 var events_default = router6;
 
