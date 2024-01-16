@@ -41,6 +41,7 @@ export const createAssociate = async (req: Request, res: Response) => {
 
 		// Crie um novo post no banco de dados com o nome da imagem no formato WebP
 		const newPost = await Associate.create({
+			fantasy_name,
 			segment_id,
 			city_id,
 			state,
