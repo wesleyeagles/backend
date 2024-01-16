@@ -64,7 +64,7 @@ Associate.init(
 	},
 	{
 		sequelize: db,
-		modelName: "associates", // Nome da tabela no banco de dados
+		modelName: "associate", // Nome da tabela no banco de dados
 		timestamps: false,
 	}
 );
