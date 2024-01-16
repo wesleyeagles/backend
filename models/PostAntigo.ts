@@ -21,7 +21,7 @@ Post.init(
 	},
 	{
 		sequelize: db,
-		modelName: "post", // Nome da tabela no banco de dados
+		modelName: "new", // Nome da tabela no banco de dados
 		timestamps: true,
 	}
 );
