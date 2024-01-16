@@ -18,6 +18,6 @@ const upload = multer({ storage });
 
 router.get("/todos-associados", associatesController.getAllAssociates);
 
-router.post("/criar-associado", upload.single("imagem"), createAssociate);
+router.post("/criar-associado", upload.single("image"), createAssociate);
 
 export default router;

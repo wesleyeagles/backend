@@ -652,7 +652,7 @@ var storage2 = import_multer2.default.diskStorage({
 });
 var upload2 = (0, import_multer2.default)({ storage: storage2 });
 router5.get("/todos-associados", associatesController_default.getAllAssociates);
-router5.post("/criar-associado", upload2.single("imagem"), createAssociate);
+router5.post("/criar-associado", upload2.single("image"), createAssociate);
 var associates_default = router5;
 
 // routes/auth.ts
