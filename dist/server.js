@@ -573,7 +573,7 @@ Associate.init(
   },
   {
     sequelize: db_default,
-    modelName: "associate",
+    modelName: "associates",
     // Nome da tabela no banco de dados
     timestamps: false
   }
