@@ -1,8 +1,20 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db";
+import { DataTypes, Model } from "sequelize";
+import db from "../config/db"; // Importe a instância do Sequelize
 
-const Associate = sequelize.define(
-	"associate",
+class Associate extends Model {
+	public segment_id!: number;
+	public city_id!: number;
+	public fantasy_name!: string;
+	public image!: string;
+	public state!: string;
+	public address!: string;
+	public neighborhood!: string;
+	public zip_code!: string;
+	public phone!: string;
+	public website!: string;
+}
+
+Associate.init(
 	{
 		segment_id: {
 			type: DataTypes.NUMBER,
@@ -51,6 +63,8 @@ const Associate = sequelize.define(
 		},
 	},
 	{
+		sequelize: db,
+		modelName: "associate", // Nome da tabela no banco de dados
 		timestamps: false,
 	}
 );

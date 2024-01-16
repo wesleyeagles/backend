@@ -521,8 +521,9 @@ var import_express5 = __toESM(require("express"));
 
 // models/Associate.ts
 var import_sequelize6 = require("sequelize");
-var Associate = db_default.define(
-  "associate",
+var Associate = class extends import_sequelize6.Model {
+};
+Associate.init(
   {
     segment_id: {
       type: import_sequelize6.DataTypes.NUMBER,
@@ -571,6 +572,9 @@ var Associate = db_default.define(
     }
   },
   {
+    sequelize: db_default,
+    modelName: "associate",
+    // Nome da tabela no banco de dados
     timestamps: false
   }
 );
