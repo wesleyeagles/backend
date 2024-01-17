@@ -9,10 +9,6 @@ export const createEvent = async (req: Request, res: Response) => {
 	try {
 		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube, tematicas } = req.body;
 
-		const publicoAlvoString = publicoAlvo.join(", ");
-		const objetivosString = objetivos.join(", ");
-		const tematicasString = tematicas.join(", ");
-
 		if (typeof nome !== "string") {
 			return res.status(400).json({ error: "O título deve ser uma string válida." });
 		}
@@ -58,9 +54,9 @@ export const createEvent = async (req: Request, res: Response) => {
 			sobre,
 			data,
 			slug,
-			publicoAlvo: publicoAlvoString,
-			objetivos: objetivosString,
-			tematicas: tematicasString,
+			publicoAlvo,
+			objetivos,
+			tematicas,
 			cargaHoraria,
 			horario,
 			modalidade,
@@ -89,12 +85,8 @@ export const editEvent = async (req: Request, res: Response) => {
 			return res.status(404).json({ error: "Evento não encontrada" });
 		}
 
-		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+		const { nome, sobre, data, publicoAlvo, objetivos, tematicas, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
 
-		const publicoAlvoString = publicoAlvo.join(", ");
-		const objetivosString = objetivos.join(", ");
-
-		console.log(req.body);
 		const slug = remove(nome).toLowerCase().replace(/\s+/g, "-");
 
 		// Compare os valores existentes com os novos
@@ -124,8 +116,9 @@ export const editEvent = async (req: Request, res: Response) => {
 		event.nome = nome;
 		event.slug = slug;
 		event.data = data;
-		event.publicoAlvo = publicoAlvoString;
-		event.objetivos = objetivosString;
+		event.publicoAlvo;
+		event.objetivos;
+		event.tematicas;
 		event.cargaHoraria = cargaHoraria;
 		event.horario = horario;
 		event.modalidade = modalidade;
