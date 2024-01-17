@@ -6,6 +6,7 @@ class Contato extends Model {
 	public email!: string;
 	public assunto!: string;
 	public telefone!: string;
+	public empresa!: string;
 	public mensagem!: string;
 }
 
@@ -21,6 +22,9 @@ Contato.init(
 			type: DataTypes.STRING,
 		},
 		mensagem: {
+			type: DataTypes.STRING,
+		},
+		empresa: {
 			type: DataTypes.STRING,
 		},
 		telefone: {
