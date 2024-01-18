@@ -4,6 +4,7 @@ import { remove } from "remove-accents";
 import axios from "axios";
 import { Client } from "basic-ftp";
 import sharp from "sharp";
+import sequelize from "../config/db";
 
 export const createEvent = async (req: Request, res: Response) => {
 	try {
@@ -230,6 +231,22 @@ export const getEvents = async (req: Request, res: Response) => {
 		const events = await Event.findAll({
 			limit: typeof parsedLimit === "number" ? parsedLimit : undefined,
 			order: [["id", "DESC"]],
+		});
+
+		res.json(events);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: "Erro interno do servidor" });
+	}
+};
+export const orderedGetEvents = async (req: Request, res: Response) => {
+	try {
+		const limit = req.query.limit as string | undefined;
+		const parsedLimit = limit ? parseInt(limit, 10) : undefined; // Mantenha como undefined se não houver limite
+
+		const events = await Event.findAll({
+			limit: typeof parsedLimit === "number" ? parsedLimit : undefined,
+			order: [[sequelize.literal(`ABS(DATEDIFF(NOW(), data))`), "ASC"]],
 		});
 
 		res.json(events);

@@ -1,5 +1,5 @@
 import express from "express";
-import { createEvent, deleteEvento, editEvent, getEventBySlug, getEvents } from "../controllers/EventController";
+import { createEvent, deleteEvento, editEvent, getEventBySlug, getEvents, orderedGetEvents } from "../controllers/EventController";
 import multer from "multer";
 
 const router = express.Router();
@@ -17,6 +17,8 @@ const upload = multer({ storage });
 
 // Rota para buscar posts com base no número fornecido
 router.get("/ultimos-events", getEvents);
+
+router.get("/ordered-events", orderedGetEvents);
 
 // Rota para excluir uma notícia pelo ID
 router.delete("/deletar/:id", deleteEvento);
