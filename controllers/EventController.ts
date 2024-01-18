@@ -7,7 +7,7 @@ import sharp from "sharp";
 
 export const createEvent = async (req: Request, res: Response) => {
 	try {
-		const { nome, sobre, data, publicoAlvo, objetivos, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube, tematicas } = req.body;
+		const { nome, sobre, data, dataFim, publicoAlvo, objetivos, cargaHoraria, horario, horarioFim, modalidade, local, link, facebook, instagram, linkedin, youtube, tematicas } = req.body;
 
 		if (typeof nome !== "string") {
 			return res.status(400).json({ error: "O título deve ser uma string válida." });
@@ -53,12 +53,14 @@ export const createEvent = async (req: Request, res: Response) => {
 			nome,
 			sobre,
 			data,
+			dataFim,
 			slug,
 			publicoAlvo,
 			objetivos,
 			tematicas,
 			cargaHoraria,
 			horario,
+			horarioFim,
 			modalidade,
 			local,
 			link,
@@ -85,7 +87,7 @@ export const editEvent = async (req: Request, res: Response) => {
 			return res.status(404).json({ error: "Evento não encontrada" });
 		}
 
-		const { nome, sobre, data, publicoAlvo, objetivos, tematicas, cargaHoraria, horario, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
+		const { nome, sobre, data, dataFim, publicoAlvo, objetivos, tematicas, cargaHoraria, horario, horarioFim, modalidade, local, link, facebook, instagram, linkedin, youtube } = req.body;
 
 		const slug = remove(nome).toLowerCase().replace(/\s+/g, "-");
 
@@ -97,6 +99,7 @@ export const editEvent = async (req: Request, res: Response) => {
 			data === event.data &&
 			publicoAlvo === event.publicoAlvo &&
 			objetivos === event.objetivos &&
+			tematicas === event.tematicas &&
 			cargaHoraria === event.cargaHoraria &&
 			horario === event.horario &&
 			modalidade === event.modalidade &&
@@ -116,11 +119,13 @@ export const editEvent = async (req: Request, res: Response) => {
 		event.nome = nome;
 		event.slug = slug;
 		event.data = data;
-		event.publicoAlvo;
-		event.objetivos;
-		event.tematicas;
+		event.dataFim = dataFim;
+		event.publicoAlvo = publicoAlvo;
+		event.objetivos = objetivos;
+		event.tematicas = tematicas;
 		event.cargaHoraria = cargaHoraria;
 		event.horario = horario;
+		event.horarioFim = horarioFim;
 		event.modalidade = modalidade;
 		event.local = local;
 		event.link = link;
